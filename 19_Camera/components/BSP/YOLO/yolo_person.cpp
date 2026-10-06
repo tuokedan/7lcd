@@ -273,8 +273,8 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
 
     dl::image::img_t image = {
         .data = const_cast<uint8_t *>(rgb565),
-        .width = static_cast<int>(width),
-        .height = static_cast<int>(height),
+        .width = width,
+        .height = height,
         .pix_type = dl::image::DL_IMAGE_PIX_TYPE_RGB565BE,
     };
 
