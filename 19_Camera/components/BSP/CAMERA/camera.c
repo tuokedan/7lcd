@@ -37,8 +37,9 @@ static camera_config_t camera_config = {
     .pixel_format = PIXFORMAT_RGB565,
     .frame_size = FRAMESIZE_QVGA,       /* 320x240，与 LCD 完全匹配 */
     .jpeg_quality = 12,
-    .fb_count = 2,
-    .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
+    .fb_count = 3,
+    /* LCD 刷屏和 AI 推理会占用较长时间，优先保留最新完整帧。 */
+    .grab_mode = CAMERA_GRAB_LATEST,
 };
 
 static inline void draw_pixel_rgb565(uint8_t *buf,
