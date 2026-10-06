@@ -35,7 +35,7 @@ static bool s_lcd_inited = false;
 static scr_info_t s_lcd_info;
 
 
-//Ìî³äLCDÉÏµÄÒ»¸öµã
+//å¡«å……LCDä¸Šçš„ä¸€ä¸ªç‚¹
 void SetBitColor(u16 x,u16 y,u16 color)
 {
     if(x>=s_lcd_info.width) return;
@@ -58,7 +58,7 @@ int lcd_getLineMaxByte(int zk_num)
     return (s_lcd_info.width)/8+1;
 }
 
-//°ÑÏÔ´æÊı¾İ¸üĞÂµ½ÏÔÊ¾ÆÁ
+//æŠŠæ˜¾å­˜æ•°æ®æ›´æ–°åˆ°æ˜¾ç¤ºå±
 void lcd_update()
 {
     int y = 0;
@@ -87,6 +87,10 @@ uint16_t lcd_GetHeight()
 
 void lcd_clear()
 {
+    if (lcd_data_buf == NULL) {
+        ESP_LOGE(TAG, "lcd_data_buf is NULL, skip lcd_clear");
+        return;
+    }
     memset((void*)lcd_data_buf, 0xff, s_lcd_info.width * s_lcd_info.height * sizeof(uint16_t));
 }
 
@@ -146,12 +150,23 @@ void lcd_init(void)
     lcd_st7789_set_invert(false);
     vTaskDelay(pdMS_TO_TICKS(100));
 
-    //ÉêÇëLCDÏÔ´æ
-    lcd_data_buf = (uint16_t *)heap_caps_calloc(s_lcd_info.width * s_lcd_info.height, sizeof(uint16_t), MALLOC_CAP_SPIRAM);
-    if(lcd_data_buf==NULL) printf("*******************lcd_data_buf is NULL*************************");
-    else memset((void*)lcd_data_buf, 0xff, s_lcd_info.width * s_lcd_info.height*sizeof(uint16_t));
+    // ç”³è¯· LCD æ˜¾å­˜ï¼šä¼˜å…ˆä½¿ç”¨ PSRAMï¼›å¦‚æœå½“å‰å·¥ç¨‹æ²¡æœ‰å¯ç”¨ PSRAMï¼Œåˆ™å›é€€åˆ°å†…éƒ¨ 8-bit RAMã€‚
+    const size_t lcd_buf_pixels = (size_t)s_lcd_info.width * s_lcd_info.height;
+    lcd_data_buf = (uint16_t *)heap_caps_calloc(lcd_buf_pixels, sizeof(uint16_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    if (lcd_data_buf == NULL) {
+        ESP_LOGW(TAG, "PSRAM LCD buffer allocation failed, try internal RAM");
+        lcd_data_buf = (uint16_t *)heap_caps_calloc(lcd_buf_pixels, sizeof(uint16_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    }
 
-    //ÇåÆÁ
+    if (lcd_data_buf == NULL) {
+        ESP_LOGE(TAG, "lcd_data_buf allocation failed (%u bytes)",
+                 (unsigned)(lcd_buf_pixels * sizeof(uint16_t)));
+        return;
+    }
+
+    memset((void *)lcd_data_buf, 0xff, lcd_buf_pixels * sizeof(uint16_t));
+
+    // æ¸…å±
     lcd_clear();
     lcd_update();
 
