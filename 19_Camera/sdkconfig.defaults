@@ -17,3 +17,8 @@ CONFIG_COCO_DETECT_MODEL_IN_FLASH_PARTITION=y
 # Use an 8 MB-compatible custom partition table
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions-8MiB.csv"
+
+# YOLO11n inference occupies CPU1 for several seconds on ESP32-S3.
+# Keep the CPU0 camera/LCD task responsive and do not treat CPU1 idle starvation
+# as a watchdog fault while the dedicated inference task is running.
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n
