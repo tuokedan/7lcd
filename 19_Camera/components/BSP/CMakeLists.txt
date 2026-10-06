@@ -14,7 +14,7 @@ set(requires
             driver
             esp32-camera
             log
-            coco_detect)
+            pedestrian_detect)
 
 idf_component_register(
     SRC_DIRS ${src_dirs}
