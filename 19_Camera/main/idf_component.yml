@@ -1,0 +1,3 @@
+dependencies:
+  espressif/pedestrian_detect:
+    version: "~0.3.2"
