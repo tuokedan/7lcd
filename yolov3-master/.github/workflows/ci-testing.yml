@@ -1,0 +1,93 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
+# YOLOv3 Continuous Integration (CI) GitHub Actions tests
+
+name: YOLOv3 CI
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "0 0 * * *" # runs at 00:00 UTC every day
+  workflow_dispatch:
+
+jobs:
+  Tests:
+    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest] # macos-latest bug https://github.com/ultralytics/yolov5/pull/9049
+        python-version: ["3.x"] # latest stable Python release
+        model: [yolov3-tiny]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.11" # mid-version coverage
+            model: yolov3-tiny
+          - os: ubuntu-latest
+            python-version: "3.8" # minimum supported Python (torch 1.8.0 supports python <=3.9)
+            model: yolov3-tiny
+            torch: "1.8.0" # minimum supported torch (PyTorch>=1.8)
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: ultralytics/actions/setup-uv@main
+      - name: Install requirements
+        run: |
+          torch=""
+          if [ "${{ matrix.torch }}" == "1.8.0" ]; then
+            torch="torch==1.8.0 torchvision==0.9.0"
+          fi
+          uv pip install --system -r requirements.txt $torch --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
+        shell: bash # for Windows compatibility
+      - name: Check environment
+        run: |
+          yolo checks
+          uv pip list
+      - name: Test detection
+        shell: bash # for Windows compatibility
+        run: |
+          # export PYTHONPATH="$PWD"  # to run '$ python *.py' files in subdirectories
+          m=${{ matrix.model }}  # official weights
+          b=runs/train/exp/weights/best  # best.pt checkpoint
+          python train.py --imgsz 64 --batch 32 --weights $m.pt --cfg $m.yaml --epochs 1 --device cpu  # train
+          for d in cpu; do  # devices
+            for w in $m $b; do  # weights
+              python val.py --imgsz 64 --batch 32 --weights $w.pt --device $d  # val
+              python detect.py --imgsz 64 --weights $w.pt --device $d  # detect
+            done
+          done
+          python hubconf.py --model $m  # hub
+          python models/yolo.py --cfg $m.yaml  # build PyTorch model
+          python export.py --weights $m.pt --img 64 --include torchscript  # export
+          python - <<EOF
+          import torch
+          im = torch.zeros([1, 3, 64, 64])
+          for path in '$m', '$b':
+              model = torch.hub.load('.', 'custom', path=path, source='local')
+              print(model('data/images/bus.jpg'))
+              model(im)  # warmup, build grids for trace
+              torch.jit.trace(model, [im])
+          EOF
+
+  Summary:
+    runs-on: ubuntu-latest
+    needs: [Tests]
+    if: always()
+    steps:
+      - name: Check for failure and notify
+        if: (needs.Tests.result == 'failure' || needs.Tests.result == 'cancelled') && github.repository == 'ultralytics/yolov3' && (github.event_name == 'schedule' || github.event_name == 'push')
+        uses: slackapi/slack-github-action@v4.0.0
+        with:
+          webhook-type: incoming-webhook
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL_YOLO }}
+          payload: |
+            text: "<!subteam^S082BPCRAJ3> *${{ github.workflow }}* ❌ `${{ github.repository }}`  <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|*Run*>"
