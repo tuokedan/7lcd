@@ -3,10 +3,11 @@
 #include "freertos/task.h"
 #include "esp_camera.h"
 #include "esp_log.h"
-#include "esp_timer.h"
 #include "driver/gpio.h"
 #include "lcd.h"
 #include "yolo_person.h"
+
+#include <stdint.h>
 
 static const char *TAG = "camera";
 
@@ -39,6 +40,66 @@ static camera_config_t camera_config = {
     .fb_count = 2,
     .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
 };
+
+static inline void draw_pixel_rgb565(uint8_t *buf,
+                                     uint16_t width,
+                                     uint16_t height,
+                                     int x,
+                                     int y,
+                                     uint16_t color)
+{
+    if (buf == NULL || x < 0 || y < 0 ||
+        x >= width || y >= height) {
+        return;
+    }
+
+    size_t offset = (static_cast<size_t>(y) * width +
+                     static_cast<size_t>(x)) * 2;
+
+    buf[offset] = (uint8_t)(color >> 8);
+    buf[offset + 1] = (uint8_t)(color & 0xFF);
+}
+
+static void draw_detection_box(uint8_t *buf,
+                               uint16_t width,
+                               uint16_t height,
+                               const yolo_detection_t *detection)
+{
+    if (buf == NULL || detection == NULL) {
+        return;
+    }
+
+    int x1 = (int)detection->x1;
+    int y1 = (int)detection->y1;
+    int x2 = (int)detection->x2;
+    int y2 = (int)detection->y2;
+
+    if (x1 < 0) x1 = 0;
+    if (y1 < 0) y1 = 0;
+    if (x2 >= width) x2 = width - 1;
+    if (y2 >= height) y2 = height - 1;
+
+    if (x2 <= x1 || y2 <= y1) {
+        return;
+    }
+
+    /* 红色矩形框，2 像素宽，直接画在当前帧上。 */
+    const uint16_t color = RED;
+
+    for (int x = x1; x <= x2; ++x) {
+        draw_pixel_rgb565(buf, width, height, x, y1, color);
+        draw_pixel_rgb565(buf, width, height, x, y1 + 1, color);
+        draw_pixel_rgb565(buf, width, height, x, y2, color);
+        draw_pixel_rgb565(buf, width, height, x, y2 - 1, color);
+    }
+
+    for (int y = y1; y <= y2; ++y) {
+        draw_pixel_rgb565(buf, width, height, x1, y, color);
+        draw_pixel_rgb565(buf, width, height, x1 + 1, y, color);
+        draw_pixel_rgb565(buf, width, height, x2, y, color);
+        draw_pixel_rgb565(buf, width, height, x2 - 1, y, color);
+    }
+}
 
 void camera_init(void)
 {
@@ -79,29 +140,28 @@ void camera_show(uint16_t x, uint16_t y)
     }
 
     /*
-     * ESP32-S3 上 320x320 INT8 YOLO11n 推理本身较重。
-     * 当前阶段优先验证“真实推理 + 像素坐标”链路，因此这里每帧执行一次。
-     * 后续做实时显示优化时，再把推理移到独立任务。
+     * YOLO 已经独立到 CPU1 后台任务。
+     * 这里只复制一帧到 YOLO 的 PSRAM 双缓冲区；
+     * 如果 YOLO 正在忙且没有空闲缓冲区，立即跳过本帧，不阻塞 LCD。
+     */
+    (void)yolo_person_submit_frame(fb->buf, fb->width, fb->height);
+
+    /*
+     * 读取最近一次检测结果。
+     * 检测可能来自前一帧，因此它代表“最近一次有效检测”，
+     * 而不是强制等待当前帧的 YOLO 推理。
      */
     yolo_detection_t detection;
-    int64_t infer_start = esp_timer_get_time();
-
-    if (yolo_person_detect_rgb565(fb->buf, fb->width, fb->height, &detection)) {
-        int64_t infer_ms = (esp_timer_get_time() - infer_start) / 1000;
-        ESP_LOGI(TAG,
-                 "person conf=%.2f bbox=(%.0f,%.0f)-(%.0f,%.0f), infer=%lld ms",
-                 detection.confidence, detection.x1, detection.y1,
-                 detection.x2, detection.y2, (long long)infer_ms);
-    } else {
-        int64_t infer_ms = (esp_timer_get_time() - infer_start) / 1000;
-        ESP_LOGI(TAG, "no person, infer=%lld ms", (long long)infer_ms);
+    if (yolo_person_get_latest_detection(&detection) &&
+        detection.confidence >= 0.35f) {
+        draw_detection_box(fb->buf, fb->width, fb->height, &detection);
     }
 
     lcd_set_window(x, y, x + fb->width - 1, y + fb->height - 1);
 
     /*
      * 摄像头已经直接输出 RGB565，因此无需再复制到 LCD 缓冲区。
-     * 直接分块发送 PSRAM 中的帧数据，降低 RAM 占用和 CPU 拷贝开销。
+     * 直接分块发送 PSRAM 中的帧数据。
      */
     const size_t chunk_size = 11520;
     size_t offset = 0;
