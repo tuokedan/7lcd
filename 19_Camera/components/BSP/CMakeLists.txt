@@ -13,7 +13,8 @@ set(include_dirs
 set(requires
             driver
             esp32-camera
-            log)
+            log
+            coco_detect)
 
 idf_component_register(
     SRC_DIRS ${src_dirs}
