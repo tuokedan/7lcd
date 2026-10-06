@@ -409,7 +409,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("E:/S3class/1_12_camera/1_12_camera/build/esp-idf/esp32-camera/cmake_install.cmake")
+  include("E:/S3class/1_12_camera/1_12_camera/build/esp-idf/espressif__esp_jpeg/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("E:/S3class/1_12_camera/1_12_camera/build/esp-idf/espressif__esp32-camera/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
@@ -430,10 +435,5 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("E:/S3class/1_12_camera/1_12_camera/build/esp-idf/main/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("E:/S3class/1_12_camera/1_12_camera/build/esp-idf/espressif__esp_jpeg/cmake_install.cmake")
 endif()
 

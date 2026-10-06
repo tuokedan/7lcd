@@ -48,12 +48,12 @@ static _spi_bus_t s_spi_bus[2];
     }
 
 #define SPI_DEVICE_MUTEX_TAKE(p_spi_dev, ret) if (!xSemaphoreTake((p_spi_dev)->mutex, ESP_SPI_MUTEX_TICKS_TO_WAIT)) { \
-        ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+        ESP_LOGE(TAG, "spi device(%ld) take mutex timeout, max wait = %lu ticks", (long)((p_spi_dev)->handle), (unsigned long)ESP_SPI_MUTEX_TICKS_TO_WAIT); \
         return (ret); \
     }
 
 #define SPI_DEVICE_MUTEX_GIVE(p_spi_dev, ret) if (!xSemaphoreGive((p_spi_dev)->mutex)) { \
-        ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+        ESP_LOGE(TAG, "spi device(%ld) give mutex failed", (long)((p_spi_dev)->handle)); \
         return (ret); \
     }
 

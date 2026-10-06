@@ -62,9 +62,9 @@ E:/S3class/1_12_camera/1_12_camera/build/esp-idf/touch_element/libtouch_element.
 E:/S3class/1_12_camera/1_12_camera/build/esp-idf/ulp/libulp.a
 E:/S3class/1_12_camera/1_12_camera/build/esp-idf/usb/libusb.a
 E:/S3class/1_12_camera/1_12_camera/build/esp-idf/wifi_provisioning/libwifi_provisioning.a
-E:/S3class/1_12_camera/1_12_camera/build/esp-idf/esp32-camera/libesp32-camera.a
+E:/S3class/1_12_camera/1_12_camera/build/esp-idf/espressif__esp_jpeg/libespressif__esp_jpeg.a
+E:/S3class/1_12_camera/1_12_camera/build/esp-idf/espressif__esp32-camera/libespressif__esp32-camera.a
 E:/S3class/1_12_camera/1_12_camera/build/esp-idf/bus/libbus.a
 E:/S3class/1_12_camera/1_12_camera/build/esp-idf/screen/libscreen.a
 E:/S3class/1_12_camera/1_12_camera/build/esp-idf/decoder_ijg/libdecoder_ijg.a
 E:/S3class/1_12_camera/1_12_camera/build/esp-idf/main/libmain.a
-E:/S3class/1_12_camera/1_12_camera/build/esp-idf/espressif__esp_jpeg/libespressif__esp_jpeg.a
