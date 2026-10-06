@@ -2,14 +2,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_camera.h"
+#include "esp_log.h"
 #include "driver/gpio.h"
 #include "lcd.h"
 
-extern uint8_t lcd_buf[115200];
+static const char *TAG = "camera";
 
-/* 摄像头配置 */
 static camera_config_t camera_config = {
-    /* 引脚配置 */
     .pin_pwdn = CAM_PIN_PWDN,
     .pin_reset = CAM_PIN_RESET,
     .pin_xclk = CAM_PIN_XCLK,
@@ -26,62 +25,75 @@ static camera_config_t camera_config = {
     .pin_vsync = CAM_PIN_VSYNC,
     .pin_href = CAM_PIN_HREF,
     .pin_pclk = CAM_PIN_PCLK,
-    /* 图像配置 */
+
     .xclk_freq_hz = 24000000,
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
+
     .fb_location = CAMERA_FB_IN_PSRAM,
-    .pixel_format = PIXFORMAT_RGB565,       /* 图像输出模式 */
-    .frame_size = FRAMESIZE_240X240,        /* 图像输出大小 */
-    .jpeg_quality = 5,                      /* 0-63，对于OV系列相机传感器，数量越少意味着质量越高 */
-    .fb_count = 2,                          /* 当使用jpeg模式时，如果fb_count超过一个，则驱动程序将在连续模式下工作 */
+    .pixel_format = PIXFORMAT_RGB565,
+    .frame_size = FRAMESIZE_QVGA,       /* 320x240，与 LCD 完全匹配 */
+    .jpeg_quality = 12,
+    .fb_count = 2,
     .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
 };
 
-/**
- * @brief       摄像头初始化
- * @param       cmd 传输的8位命令数据
- * @retval      无
- */
 void camera_init(void)
 {
-    CAM_PWDN(0);
+    /* RESET 为有效低，PWDN 在硬件上未接 ESP32 GPIO。 */
     CAM_RST(0);
-    vTaskDelay(20);
+    vTaskDelay(pdMS_TO_TICKS(20));
     CAM_RST(1);
-    vTaskDelay(20);
+    vTaskDelay(pdMS_TO_TICKS(20));
 
-    esp_camera_init(&camera_config);
+    esp_err_t ret = esp_camera_init(&camera_config);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Camera init failed: 0x%x", ret);
+        return;
+    }
+
+    sensor_t *sensor = esp_camera_sensor_get();
+    if (sensor != NULL) {
+        ESP_LOGI(TAG, "Camera sensor initialized");
+        ESP_LOGI(TAG, "Frame size: 320x240, format: RGB565");
+    }
 }
 
-unsigned long i = 0;
-unsigned long j = 0;
-camera_fb_t *fb = NULL;
-
-/**
- * @brief       显示摄像头数据（RGB565）
- * @param       x：x轴坐标
- * @param       y：y轴坐标
- * @retval      无
- */
 void camera_show(uint16_t x, uint16_t y)
 {
-    fb = esp_camera_fb_get();
+    camera_fb_t *fb = esp_camera_fb_get();
+    if (fb == NULL) {
+        ESP_LOGW(TAG, "Camera frame capture failed");
+        return;
+    }
+
+    if (fb->format != PIXFORMAT_RGB565 ||
+        x + fb->width > LCD_WIDTH ||
+        y + fb->height > LCD_HEIGHT) {
+        ESP_LOGW(TAG, "Unsupported frame: %ux%u format=%d",
+                 fb->width, fb->height, fb->format);
+        esp_camera_fb_return(fb);
+        return;
+    }
 
     lcd_set_window(x, y, x + fb->width - 1, y + fb->height - 1);
- 
-    for (j = 0; j < fb->width * fb->height; j++)                /* lcd_buf存储摄像头整一帧RGB数据 */
-    {
-        lcd_buf[2 * j] = (fb->buf[2 * i]) ;
-        lcd_buf[2 * j + 1] =  (fb->buf[2 * i + 1]);
-        i ++;
+
+    /*
+     * 摄像头已经直接输出 RGB565，因此无需再复制到 LCD 缓冲区。
+     * 直接分块发送 PSRAM 中的帧数据，降低 RAM 占用和 CPU 拷贝开销。
+     */
+    const size_t chunk_size = 11520;
+    size_t offset = 0;
+
+    while (offset < fb->len) {
+        size_t chunk = fb->len - offset;
+        if (chunk > chunk_size) {
+            chunk = chunk_size;
+        }
+
+        lcd_write_datan(fb->buf + offset, (uint16_t)chunk);
+        offset += chunk;
     }
-    
-    for(j = 0; j < (fb->width * fb->height * 2 / 11520); j++)   /* 例如：240*240*2/11520 = 10;分10次发送RGB数据,即：将LCD十等分发送图片数据 */
-    {  
-        lcd_write_datan(&lcd_buf[j * 11520] , 11520);           /* &lcd_buf[j * LCD_BUF_SIZE] 偏移地址发送数据 */
-    }
+
     esp_camera_fb_return(fb);
-    i = 0;
-    fb = NULL;
 }
