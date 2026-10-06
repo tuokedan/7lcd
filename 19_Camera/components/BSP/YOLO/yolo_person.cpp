@@ -21,6 +21,10 @@ static constexpr size_t FRAME_BYTES =
     static_cast<size_t>(FRAME_WIDTH) * FRAME_HEIGHT * 2;
 static constexpr int BUFFER_COUNT = 2;
 
+/* 当前 PICO_S8_V1 单次推理约 300 ms。限制送入频率，避免 CPU1 连续满载。 */
+static constexpr int64_t DETECT_INTERVAL_US = 500000; /* 约 2 FPS */
+static int64_t s_last_submit_us = 0;
+
 static PedestrianDetect *s_detector = nullptr;
 static uint8_t *s_frame_buffers[BUFFER_COUNT] = {nullptr, nullptr};
 
@@ -117,7 +121,7 @@ static void yolo_task(void *arg)
                      (long long)infer_ms);
         } else {
             update_latest_detection(nullptr, false);
-            ESP_LOGI(TAG, "no person, infer=%lld ms",
+            ESP_LOGD(TAG, "no person, infer=%lld ms",
                      (long long)infer_ms);
         }
 
@@ -217,6 +221,13 @@ extern "C" bool yolo_person_submit_frame(const uint8_t *rgb565,
         s_frame_queue == nullptr) {
         return false;
     }
+
+    const int64_t now_us = esp_timer_get_time();
+    if (s_last_submit_us != 0 &&
+        now_us - s_last_submit_us < DETECT_INTERVAL_US) {
+        return false;
+    }
+    s_last_submit_us = now_us;
 
     int index = -1;
     if (!find_free_buffer(&index)) {
