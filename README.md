@@ -1,36 +1,32 @@
-<<<<<<< HEAD
-# _Sample project_
+# ESP32-S3 V1.4 LCD Example
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+基于 ESP-IDF 的 ST7789 LCD 测试工程。
 
-This is the simplest buildable example. The example is used by command `idf.py create-project`
-that copies the project to user specified path and set it's name. For more information follow the [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project)
+## LCD 引脚
 
+根据仓库中的《ESP32-S3 V1.4原理图.pdf》：
 
+| LCD 信号 | ESP32-S3 GPIO |
+|---|---:|
+| LCD_CLK | GPIO42 |
+| LCD_CS1 | GPIO45 |
+| LCD_RESET | GPIO2 |
+| LCD_DC | GPIO41 |
+| LCD_MOSI | GPIO48 |
+| LCD_MISO | GPIO47 |
 
-## How to use example
-We encourage the users to use the example as a template for the new projects.
-A recommended way is to follow the instructions on a [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project).
+本工程使用 SPI2。
 
-## Example folder contents
+> 注意：GPIO42 是 LCD_CLK，不是背光控制脚。原示例把 GPIO42 同时作为 BLK 使用，这是错误的，现已删除背光 GPIO 控制。
 
-The project **sample_project** contains one source file in C language [main.c](main/main.c). The file is located in folder [main](main).
+## 当前测试
 
-ESP-IDF projects are built using CMake. The project build configuration is contained in `CMakeLists.txt`
-files that provide set of directives and instructions describing the project's source files and targets
-(executable, library, or both). 
+启动后清屏并显示：
 
-Below is short explanation of remaining files in the project folder.
+- A
+- HELLOWORLD
+- 十进制数字
+- 十六进制数字
+- 浮点数
 
-```
-├── CMakeLists.txt
-├── main
-│   ├── CMakeLists.txt
-│   └── main.c
-└── README.md                  This is the file you are currently reading
-```
-Additionally, the sample project contains Makefile and component.mk files, used for the legacy Make based build system. 
-They are not used or needed when building with CMake and idf.py.
-=======
-# 7lcd
->>>>>>> a7fde3627a37984d7978f8308eaf606909b2578c
+后续可以在此工程基础上继续加入 OV2640 摄像头采集和图像显示。
