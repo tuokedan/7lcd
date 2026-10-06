@@ -3,6 +3,7 @@
 #include "freertos/task.h"
 #include "esp_camera.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "driver/gpio.h"
 #include "lcd.h"
 #include "yolo_person.h"
@@ -77,11 +78,23 @@ void camera_show(uint16_t x, uint16_t y)
         return;
     }
 
+    /*
+     * ESP32-S3 上 320x320 INT8 YOLO11n 推理本身较重。
+     * 当前阶段优先验证“真实推理 + 像素坐标”链路，因此这里每帧执行一次。
+     * 后续做实时显示优化时，再把推理移到独立任务。
+     */
     yolo_detection_t detection;
+    int64_t infer_start = esp_timer_get_time();
+
     if (yolo_person_detect_rgb565(fb->buf, fb->width, fb->height, &detection)) {
-        ESP_LOGI(TAG, "person conf=%.2f bbox=(%.0f,%.0f)-(%.0f,%.0f)",
+        int64_t infer_ms = (esp_timer_get_time() - infer_start) / 1000;
+        ESP_LOGI(TAG,
+                 "person conf=%.2f bbox=(%.0f,%.0f)-(%.0f,%.0f), infer=%lld ms",
                  detection.confidence, detection.x1, detection.y1,
-                 detection.x2, detection.y2);
+                 detection.x2, detection.y2, (long long)infer_ms);
+    } else {
+        int64_t infer_ms = (esp_timer_get_time() - infer_start) / 1000;
+        ESP_LOGI(TAG, "no person, infer=%lld ms", (long long)infer_ms);
     }
 
     lcd_set_window(x, y, x + fb->width - 1, y + fb->height - 1);
