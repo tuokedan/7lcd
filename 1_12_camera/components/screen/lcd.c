@@ -40,6 +40,7 @@ void SetBitColor(u16 x,u16 y,u16 color)
 {
     if(x>=s_lcd_info.width) return;
     if(y>=s_lcd_info.height) return;
+    if(lcd_data_buf==NULL) return;
 
     *(lcd_data_buf+y*s_lcd_info.width+x)= color;
 }
@@ -62,18 +63,35 @@ int lcd_getLineMaxByte(int zk_num)
 void lcd_update()
 {
     int y = 0;
-    int line=40;
+    const int line = 20;
+
     if(lcd_data_buf==NULL) return;
 
     while(y<s_lcd_info.height)
     {
-      if(y+line>s_lcd_info.height) line=s_lcd_info.height-y;
-      lcd_st7789_draw_bitmap(0, y, s_lcd_info.width, line, (uint16_t *)(lcd_data_buf+y*s_lcd_info.width));
-      y+=line;
+        int current_line = line;
+
+        if(y+current_line>s_lcd_info.height)
+        {
+            current_line=s_lcd_info.height-y;
+        }
+
+        lcd_st7789_draw_bitmap(
+            0,
+            y,
+            s_lcd_info.width,
+            current_line,
+            (uint16_t *)(lcd_data_buf+y*s_lcd_info.width)
+        );
+
+        y += current_line;
+
+        // 给 FreeRTOS 空闲任务留出运行机会，避免连续 SPI 传输长时间占用 CPU。
+        taskYIELD();
     }
+}
 
 //    lcd_st7789_draw_bitmap(0, 0, s_lcd_info.width, s_lcd_info.height, (uint16_t *)lcd_data_buf);
-}
 
 uint16_t lcd_GetWidth()
 {
@@ -140,8 +158,8 @@ void lcd_init(void)
     esp_err_t ret = lcd_st7789_init(&lcd_cfg);
 
     if (ESP_OK != ret) {
+        ESP_LOGE(TAG, "screen initialize failed: %s", esp_err_to_name(ret));
         return;
-        ESP_LOGE(TAG, "screen initialize failed");
     }
 
     lcd_st7789_get_info(&s_lcd_info);
@@ -172,5 +190,3 @@ void lcd_init(void)
 
     s_lcd_inited = true;
 }
-
-
