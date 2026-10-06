@@ -1,0 +1,1282 @@
+[0/1] Re-running CMake...
+-- ccache will be used for faster recompilation
+-- Building ESP-IDF components for target esp32s3
+Processing 3 dependencies:
+[1/3] espressif/esp32-camera (2.1.8)
+[2/3] espressif/esp_jpeg (1.3.1)
+[3/3] idf (5.1.2)
+-- Project sdkconfig file E:/S3class/1_12_camera/1_12_camera/sdkconfig
+Loading defaults file E:/S3class/1_12_camera/1_12_camera/sdkconfig.defaults...
+E:/S3class/1_12_camera/1_12_camera/sdkconfig.defaults:9 CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE was replaced with CONFIG_ESP_WIFI_ENABLE_WPA3_SAE
+-- App "esp32s3-camera" version: 05b598b-dirty
+-- Adding linker script E:/S3class/1_12_camera/1_12_camera/build/esp-idf/esp_system/ld/memory.ld
+-- Adding linker script E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/ld/esp32s3/sections.ld.in
+-- Adding linker script E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3/ld/esp32s3.rom.ld
+-- Adding linker script E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3/ld/esp32s3.rom.api.ld
+-- Adding linker script E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3/ld/esp32s3.rom.libgcc.ld
+-- Adding linker script E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3/ld/esp32s3.rom.newlib.ld
+-- Adding linker script E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3/ld/esp32s3.rom.version.ld
+-- Adding linker script E:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/esp32s3/ld/esp32s3.peripherals.ld
+-- Components: app_trace app_update bootloader bootloader_support bt bus cmock console cxx decoder_ijg driver efuse esp-tls esp_adc esp_app_format esp_coex esp_common esp_eth esp_event esp_gdbstub esp_hid esp_http_client esp_http_server esp_https_ota esp_https_server esp_hw_support esp_lcd esp_local_ctrl esp_mm esp_netif esp_netif_stack esp_partition esp_phy esp_pm esp_psram esp_ringbuf esp_rom esp_system esp_timer esp_wifi espcoredump espressif__esp32-camera espressif__esp_jpeg esptool_py fatfs freertos hal heap http_parser idf_test ieee802154 json log lwip main mbedtls mqtt newlib nvs_flash openthread partition_table perfmon protobuf-c protocomm pthread screen sdmmc soc spi_flash spiffs tcp_transport touch_element ulp unity usb vfs wear_levelling wifi_provisioning wpa_supplicant xtensa
+-- Component paths: E:/Espressif/frameworks/esp-idf-v5.1.2/components/app_trace E:/Espressif/frameworks/esp-idf-v5.1.2/components/app_update E:/Espressif/frameworks/esp-idf-v5.1.2/components/bootloader E:/Espressif/frameworks/esp-idf-v5.1.2/components/bootloader_support E:/Espressif/frameworks/esp-idf-v5.1.2/components/bt E:/S3class/1_12_camera/1_12_camera/components/bus E:/Espressif/frameworks/esp-idf-v5.1.2/components/cmock E:/Espressif/frameworks/esp-idf-v5.1.2/components/console E:/Espressif/frameworks/esp-idf-v5.1.2/components/cxx E:/S3class/1_12_camera/1_12_camera/components/decoder_ijg E:/Espressif/frameworks/esp-idf-v5.1.2/components/driver E:/Espressif/frameworks/esp-idf-v5.1.2/components/efuse E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp-tls E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_adc E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_app_format E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_coex E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_common E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_eth E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_event E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_gdbstub E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hid E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_http_client E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_http_server E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_https_ota E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_https_server E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_lcd E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_local_ctrl E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_mm E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_netif E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_netif_stack E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_partition E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_phy E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_pm E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_psram E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_ringbuf E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_timer E:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_wifi E:/Espressif/frameworks/esp-idf-v5.1.2/components/espcoredump E:/S3class/1_12_camera/1_12_camera/managed_components/espressif__esp32-camera E:/S3class/1_12_camera/1_12_camera/managed_components/espressif__esp_jpeg E:/Espressif/frameworks/esp-idf-v5.1.2/components/esptool_py E:/Espressif/frameworks/esp-idf-v5.1.2/components/fatfs E:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos E:/Espressif/frameworks/esp-idf-v5.1.2/components/hal E:/Espressif/frameworks/esp-idf-v5.1.2/components/heap E:/Espressif/frameworks/esp-idf-v5.1.2/components/http_parser E:/Espressif/frameworks/esp-idf-v5.1.2/components/idf_test E:/Espressif/frameworks/esp-idf-v5.1.2/components/ieee802154 E:/Espressif/frameworks/esp-idf-v5.1.2/components/json E:/Espressif/frameworks/esp-idf-v5.1.2/components/log E:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip E:/S3class/1_12_camera/1_12_camera/main E:/Espressif/frameworks/esp-idf-v5.1.2/components/mbedtls E:/Espressif/frameworks/esp-idf-v5.1.2/components/mqtt E:/Espressif/frameworks/esp-idf-v5.1.2/components/newlib E:/Espressif/frameworks/esp-idf-v5.1.2/components/nvs_flash E:/Espressif/frameworks/esp-idf-v5.1.2/components/openthread E:/Espressif/frameworks/esp-idf-v5.1.2/components/partition_table E:/Espressif/frameworks/esp-idf-v5.1.2/components/perfmon E:/Espressif/frameworks/esp-idf-v5.1.2/components/protobuf-c E:/Espressif/frameworks/esp-idf-v5.1.2/components/protocomm E:/Espressif/frameworks/esp-idf-v5.1.2/components/pthread E:/S3class/1_12_camera/1_12_camera/components/screen E:/Espressif/frameworks/esp-idf-v5.1.2/components/sdmmc E:/Espressif/frameworks/esp-idf-v5.1.2/components/soc E:/Espressif/frameworks/esp-idf-v5.1.2/components/spi_flash E:/Espressif/frameworks/esp-idf-v5.1.2/components/spiffs E:/Espressif/frameworks/esp-idf-v5.1.2/components/tcp_transport E:/Espressif/frameworks/esp-idf-v5.1.2/components/touch_element E:/Espressif/frameworks/esp-idf-v5.1.2/components/ulp E:/Espressif/frameworks/esp-idf-v5.1.2/components/unity E:/Espressif/frameworks/esp-idf-v5.1.2/components/usb E:/Espressif/frameworks/esp-idf-v5.1.2/components/vfs E:/Espressif/frameworks/esp-idf-v5.1.2/components/wear_levelling E:/Espressif/frameworks/esp-idf-v5.1.2/components/wifi_provisioning E:/Espressif/frameworks/esp-idf-v5.1.2/components/wpa_supplicant E:/Espressif/frameworks/esp-idf-v5.1.2/components/xtensa
+-- Configuring done
+-- Generating done
+-- Build files have been written to: E:/S3class/1_12_camera/1_12_camera/build
+[1/41] Building C object esp-idf/bus/CMakeFiles/__idf_bus.dir/i2s_lcd_esp32s2_driver.c.obj
+[2/41] Building C object esp-idf/bus/CMakeFiles/__idf_bus.dir/i2s_lcd_esp32_driver.c.obj
+[3/41] Performing build step for 'bootloader'
+[1/1] cmd.exe /C "cd /D E:\S3class\1_12_camera\1_12_camera\build\bootloader\esp-idf\esptool_py && E:\Espressif\python_env\idf5.1_py3.11_env\Scripts\python.exe E:/Espressif/frameworks/esp-idf-v5.1.2/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 E:/S3class/1_12_camera/1_12_camera/build/bootloader/bootloader.bin"
+Bootloader binary size 0x5770 bytes. 0x2890 bytes (32%) free.
+[4/39] Building C object esp-idf/decoder_ijg/CMakeFiles/__idf_decoder_ijg.dir/jpeg-9a/jdapimin.c.obj
+[5/39] Building C object esp-idf/bus/CMakeFiles/__idf_bus.dir/spi_bus.c.obj
+FAILED: esp-idf/bus/CMakeFiles/__idf_bus.dir/spi_bus.c.obj 
+ccache E:\Espressif\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -DESP_PLATFORM -DIDF_VER=\"v5.1.2-dirty\" -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -IE:/S3class/1_12_camera/1_12_camera/build/config -IE:/S3class/1_12_camera/1_12_camera/components/bus/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/newlib/platform_include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/include/freertos -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/arch/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include/soc -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include/soc/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/port/esp32s3/. -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/port/esp32s3/private_include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/heap/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/platform_port/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/include/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_common/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/port/soc -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/port/include/private -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/xtensa/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include/apps -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include/apps/sntp -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/lwip/src/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/freertos/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/esp32xx/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/esp32xx/include/arch -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/analog_comparator/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/dac/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/gpio/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/gptimer/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/i2c/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/i2s/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/ledc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/mcpwm/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/parlio/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/pcnt/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/rmt/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sdio_slave/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sdmmc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sigma_delta/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/spi/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/temperature_sensor/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/touch_sensor/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/twai/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/uart/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/usb_serial_jtag/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/touch_sensor/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_pm/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_ringbuf/include -mlongcalls  -fdiagnostics-color=always -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror=all -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -Og -fmacro-prefix-map=E:/S3class/1_12_camera/1_12_camera=. -fmacro-prefix-map=E:/Espressif/frameworks/esp-idf-v5.1.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -DconfigENABLE_FREERTOS_DEBUG_OCDAWARE=1 -std=gnu17 -Wno-old-style-declaration -MD -MT esp-idf/bus/CMakeFiles/__idf_bus.dir/spi_bus.c.obj -MF esp-idf\bus\CMakeFiles\__idf_bus.dir\spi_bus.c.obj.d -o esp-idf/bus/CMakeFiles/__idf_bus.dir/spi_bus.c.obj -c E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:16:
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c: In function 'spi_bus_device_delete':
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:140:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  140 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:140:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  140 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:140:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  140 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:140:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  140 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:140:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  140 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:140:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  140 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:140:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  140 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:142:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  142 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:142:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  142 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:142:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  142 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:142:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  142 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:142:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  142 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:142:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  142 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:142:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  142 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c: In function '_spi_device_polling_transmit':
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:157:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  157 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:157:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  157 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:157:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  157 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:157:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  157 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:157:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  157 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:157:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  157 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:51:9: note: in expansion of macro 'ESP_LOGE'
+   51 |         ESP_LOGE(TAG, "spi device(%d) take mutex timeout, max wait = %d ticks", (int32_t)((p_spi_dev)->handle), ESP_SPI_MUTEX_TICKS_TO_WAIT); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:157:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_TAKE'
+  157 |     SPI_DEVICE_MUTEX_TAKE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:159:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  159 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:159:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  159 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:159:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  159 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:159:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  159 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:159:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  159 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:159:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  159 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:56:9: note: in expansion of macro 'ESP_LOGE'
+   56 |         ESP_LOGE(TAG, "spi device(%d) give mutex failed", (int32_t)((p_spi_dev)->handle)); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/spi_bus.c:159:5: note: in expansion of macro 'SPI_DEVICE_MUTEX_GIVE'
+  159 |     SPI_DEVICE_MUTEX_GIVE(spi_dev, ESP_FAIL);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+cc1.exe: some warnings being treated as errors
+[6/39] Building C object esp-idf/bus/CMakeFiles/__idf_bus.dir/i2c_bus.c.obj
+FAILED: esp-idf/bus/CMakeFiles/__idf_bus.dir/i2c_bus.c.obj 
+ccache E:\Espressif\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -DESP_PLATFORM -DIDF_VER=\"v5.1.2-dirty\" -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -IE:/S3class/1_12_camera/1_12_camera/build/config -IE:/S3class/1_12_camera/1_12_camera/components/bus/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/newlib/platform_include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/include/freertos -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/arch/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include/soc -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include/soc/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/port/esp32s3/. -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/port/esp32s3/private_include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/heap/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/platform_port/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/include/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_common/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/port/soc -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/port/include/private -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/xtensa/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include/apps -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include/apps/sntp -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/lwip/src/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/freertos/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/esp32xx/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/esp32xx/include/arch -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/analog_comparator/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/dac/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/gpio/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/gptimer/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/i2c/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/i2s/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/ledc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/mcpwm/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/parlio/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/pcnt/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/rmt/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sdio_slave/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sdmmc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sigma_delta/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/spi/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/temperature_sensor/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/touch_sensor/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/twai/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/uart/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/usb_serial_jtag/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/touch_sensor/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_pm/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_ringbuf/include -mlongcalls  -fdiagnostics-color=always -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror=all -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -Og -fmacro-prefix-map=E:/S3class/1_12_camera/1_12_camera=. -fmacro-prefix-map=E:/Espressif/frameworks/esp-idf-v5.1.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -DconfigENABLE_FREERTOS_DEBUG_OCDAWARE=1 -std=gnu17 -Wno-old-style-declaration -MD -MT esp-idf/bus/CMakeFiles/__idf_bus.dir/i2c_bus.c.obj -MF esp-idf\bus\CMakeFiles\__idf_bus.dir\i2c_bus.c.obj.d -o esp-idf/bus/CMakeFiles/__idf_bus.dir/i2c_bus.c.obj -c E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:20:
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_create':
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:94:13: note: in expansion of macro 'ESP_LOGW'
+   94 |             ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+      |             ^~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:94:13: note: in expansion of macro 'ESP_LOGW'
+   94 |             ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+      |             ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:94:1: error: format '%d' expects argument of type 'int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+   94 |             ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+      | ^          
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:94:13: note: in expansion of macro 'ESP_LOGW'
+   94 |             ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+      |             ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:94:1: error: format '%d' expects argument of type 'int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+   94 |             ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+      | ^          
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:94:13: note: in expansion of macro 'ESP_LOGW'
+   94 |             ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+      |             ^~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:94:13: note: in expansion of macro 'ESP_LOGW'
+   94 |             ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+      |             ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_delete':
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:115:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  115 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:115:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  115 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:115:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  115 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:115:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  115 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:115:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  115 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:115:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  115 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:115:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  115 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%u' expects argument of type 'unsigned int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:119:9: note: in expansion of macro 'ESP_LOGW'
+  119 |         ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+      |         ^~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%u' expects argument of type 'unsigned int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:119:9: note: in expansion of macro 'ESP_LOGW'
+  119 |         ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:119:1: error: format '%u' expects argument of type 'unsigned int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  119 |         ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+      | ^       ~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:119:9: note: in expansion of macro 'ESP_LOGW'
+  119 |         ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:119:1: error: format '%u' expects argument of type 'unsigned int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  119 |         ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+      | ^       ~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:119:9: note: in expansion of macro 'ESP_LOGW'
+  119 |         ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+      |         ^~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%u' expects argument of type 'unsigned int', but argument 7 has type 'int32_t' {aka 'long int'} [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:341:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  341 | #define ESP_LOGW( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN,    tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:119:9: note: in expansion of macro 'ESP_LOGW'
+  119 |         ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_scan':
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:136:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  136 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:136:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  136 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:136:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  136 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, 0);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:136:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  136 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:136:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  136 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, 0);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:136:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  136 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:136:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  136 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:28:51: error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 'portTICK_PERIOD_MS'?
+   28 | #define I2C_BUS_TICKS_TO_WAIT (I2C_BUS_MS_TO_WAIT/portTICK_RATE_MS)
+      |                                                   ^~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:142:70: note: in expansion of macro 'I2C_BUS_TICKS_TO_WAIT'
+  142 |         esp_err_t ret = i2c_master_cmd_begin(i2c_bus->i2c_port, cmd, I2C_BUS_TICKS_TO_WAIT);
+      |                                                                      ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:28:51: note: each undeclared identifier is reported only once for each function it appears in
+   28 | #define I2C_BUS_TICKS_TO_WAIT (I2C_BUS_MS_TO_WAIT/portTICK_RATE_MS)
+      |                                                   ^~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:142:70: note: in expansion of macro 'I2C_BUS_TICKS_TO_WAIT'
+  142 |         esp_err_t ret = i2c_master_cmd_begin(i2c_bus->i2c_port, cmd, I2C_BUS_TICKS_TO_WAIT);
+      |                                                                      ^~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_device_create':
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:182:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  182 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, NULL);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:182:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  182 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, NULL);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:182:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  182 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, NULL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:182:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  182 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, NULL);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:182:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  182 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, NULL);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:182:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  182 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, NULL);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:182:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  182 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_bus->mutex, NULL);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_device_delete':
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:268:27: note: in expansion of macro 'LOG_COLOR'
+  268 | #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_E'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:410:86: note: in expansion of macro 'LOG_FORMAT'
+  410 |         if (level==ESP_LOG_ERROR )          { esp_log_write(ESP_LOG_ERROR,      tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:201:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  201 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:269:27: note: in expansion of macro 'LOG_COLOR'
+  269 | #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_W'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:411:86: note: in expansion of macro 'LOG_FORMAT'
+  411 |         else if (level==ESP_LOG_WARN )      { esp_log_write(ESP_LOG_WARN,       tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:201:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  201 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:201:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  201 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:201:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  201 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:201:1: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  201 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      | ^   ~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:59: note: in definition of macro 'LOG_FORMAT'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                                           ^~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:201:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  201 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:265:27: error: format '%d' expects argument of type 'int', but argument 6 has type 'long unsigned int' [-Werror=format=]
+  265 | #define LOG_COLOR(COLOR)  "\033[0;" COLOR "m"
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:270:27: note: in expansion of macro 'LOG_COLOR'
+  270 | #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
+      |                           ^~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:282:37: note: in expansion of macro 'LOG_COLOR_I'
+  282 | #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+      |                                     ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:414:86: note: in expansion of macro 'LOG_FORMAT'
+  414 |         else                                { esp_log_write(ESP_LOG_INFO,       tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                      ^~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:432:41: note: in expansion of macro 'ESP_LOG_LEVEL'
+  432 |         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
+      |                                         ^~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include/esp_log.h:340:38: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  340 | #define ESP_LOGE( tag, format, ... ) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR,   tag, format, ##__VA_ARGS__)
+      |                                      ^~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:69:9: note: in expansion of macro 'ESP_LOGE'
+   69 |         ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+      |         ^~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:201:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE_MAX_DELAY'
+  201 |     I2C_BUS_MUTEX_TAKE_MAX_DELAY(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:18:
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_cmd_begin':
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:29:57: error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 'portTICK_PERIOD_MS'?
+   29 | #define I2C_BUS_MUTEX_TICKS_TO_WAIT (I2C_BUS_MS_TO_WAIT/portTICK_RATE_MS)
+      |                                                         ^~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h:319:92: note: in definition of macro 'xSemaphoreTake'
+  319 | #define xSemaphoreTake( xSemaphore, xBlockTime )    xQueueSemaphoreTake( ( xSemaphore ), ( xBlockTime ) )
+      |                                                                                            ^~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:63:67: note: in expansion of macro 'I2C_BUS_MUTEX_TICKS_TO_WAIT'
+   63 | #define I2C_BUS_MUTEX_TAKE(mutex, ret) if (!xSemaphoreTake(mutex, I2C_BUS_MUTEX_TICKS_TO_WAIT)) { \
+      |                                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:329:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE'
+  329 |     I2C_BUS_MUTEX_TAKE(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_read_reg8':
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:29:57: error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 'portTICK_PERIOD_MS'?
+   29 | #define I2C_BUS_MUTEX_TICKS_TO_WAIT (I2C_BUS_MS_TO_WAIT/portTICK_RATE_MS)
+      |                                                         ^~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h:319:92: note: in definition of macro 'xSemaphoreTake'
+  319 | #define xSemaphoreTake( xSemaphore, xBlockTime )    xQueueSemaphoreTake( ( xSemaphore ), ( xBlockTime ) )
+      |                                                                                            ^~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:63:67: note: in expansion of macro 'I2C_BUS_MUTEX_TICKS_TO_WAIT'
+   63 | #define I2C_BUS_MUTEX_TAKE(mutex, ret) if (!xSemaphoreTake(mutex, I2C_BUS_MUTEX_TICKS_TO_WAIT)) { \
+      |                                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:341:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE'
+  341 |     I2C_BUS_MUTEX_TAKE(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_read_reg16':
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:29:57: error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 'portTICK_PERIOD_MS'?
+   29 | #define I2C_BUS_MUTEX_TICKS_TO_WAIT (I2C_BUS_MS_TO_WAIT/portTICK_RATE_MS)
+      |                                                         ^~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h:319:92: note: in definition of macro 'xSemaphoreTake'
+  319 | #define xSemaphoreTake( xSemaphore, xBlockTime )    xQueueSemaphoreTake( ( xSemaphore ), ( xBlockTime ) )
+      |                                                                                            ^~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:63:67: note: in expansion of macro 'I2C_BUS_MUTEX_TICKS_TO_WAIT'
+   63 | #define I2C_BUS_MUTEX_TAKE(mutex, ret) if (!xSemaphoreTake(mutex, I2C_BUS_MUTEX_TICKS_TO_WAIT)) { \
+      |                                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:369:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE'
+  369 |     I2C_BUS_MUTEX_TAKE(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_write_reg8':
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:29:57: error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 'portTICK_PERIOD_MS'?
+   29 | #define I2C_BUS_MUTEX_TICKS_TO_WAIT (I2C_BUS_MS_TO_WAIT/portTICK_RATE_MS)
+      |                                                         ^~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h:319:92: note: in definition of macro 'xSemaphoreTake'
+  319 | #define xSemaphoreTake( xSemaphore, xBlockTime )    xQueueSemaphoreTake( ( xSemaphore ), ( xBlockTime ) )
+      |                                                                                            ^~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:63:67: note: in expansion of macro 'I2C_BUS_MUTEX_TICKS_TO_WAIT'
+   63 | #define I2C_BUS_MUTEX_TAKE(mutex, ret) if (!xSemaphoreTake(mutex, I2C_BUS_MUTEX_TICKS_TO_WAIT)) { \
+      |                                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:394:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE'
+  394 |     I2C_BUS_MUTEX_TAKE(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c: In function 'i2c_bus_write_reg16':
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:29:57: error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 'portTICK_PERIOD_MS'?
+   29 | #define I2C_BUS_MUTEX_TICKS_TO_WAIT (I2C_BUS_MS_TO_WAIT/portTICK_RATE_MS)
+      |                                                         ^~~~~~~~~~~~~~~~
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h:319:92: note: in definition of macro 'xSemaphoreTake'
+  319 | #define xSemaphoreTake( xSemaphore, xBlockTime )    xQueueSemaphoreTake( ( xSemaphore ), ( xBlockTime ) )
+      |                                                                                            ^~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:63:67: note: in expansion of macro 'I2C_BUS_MUTEX_TICKS_TO_WAIT'
+   63 | #define I2C_BUS_MUTEX_TAKE(mutex, ret) if (!xSemaphoreTake(mutex, I2C_BUS_MUTEX_TICKS_TO_WAIT)) { \
+      |                                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/bus/i2c_bus.c:420:5: note: in expansion of macro 'I2C_BUS_MUTEX_TAKE'
+  420 |     I2C_BUS_MUTEX_TAKE(i2c_device->i2c_bus->mutex, ESP_ERR_TIMEOUT);
+      |     ^~~~~~~~~~~~~~~~~~
+cc1.exe: some warnings being treated as errors
+[7/39] Building C object esp-idf/screen/CMakeFiles/__idf_screen.dir/st7789.c.obj
+FAILED: esp-idf/screen/CMakeFiles/__idf_screen.dir/st7789.c.obj 
+ccache E:\Espressif\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -DESP_PLATFORM -DIDF_VER=\"v5.1.2-dirty\" -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -IE:/S3class/1_12_camera/1_12_camera/build/config -IE:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver -IE:/S3class/1_12_camera/1_12_camera/components/screen -IE:/S3class/1_12_camera/1_12_camera/components/screen/screen_utility -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/newlib/platform_include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/include/freertos -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/freertos/esp_additions/arch/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include/soc -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/include/soc/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/port/esp32s3/. -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_hw_support/port/esp32s3/private_include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/heap/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/log/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/soc/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/hal/platform_port/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/include/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_rom/esp32s3 -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_common/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/port/soc -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_system/port/include/private -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/xtensa/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/xtensa/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include/apps -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/include/apps/sntp -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/lwip/src/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/freertos/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/esp32xx/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/lwip/port/esp32xx/include/arch -IE:/S3class/1_12_camera/1_12_camera/components/bus/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/analog_comparator/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/dac/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/gpio/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/gptimer/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/i2c/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/i2s/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/ledc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/mcpwm/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/parlio/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/pcnt/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/rmt/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sdio_slave/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sdmmc/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/sigma_delta/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/spi/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/temperature_sensor/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/touch_sensor/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/twai/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/uart/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/usb_serial_jtag/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/touch_sensor/esp32s3/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_pm/include -IE:/Espressif/frameworks/esp-idf-v5.1.2/components/esp_ringbuf/include -mlongcalls  -fdiagnostics-color=always -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror=all -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -Og -fmacro-prefix-map=E:/S3class/1_12_camera/1_12_camera=. -fmacro-prefix-map=E:/Espressif/frameworks/esp-idf-v5.1.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -DconfigENABLE_FREERTOS_DEBUG_OCDAWARE=1 -std=gnu17 -Wno-old-style-declaration -MD -MT esp-idf/screen/CMakeFiles/__idf_screen.dir/st7789.c.obj -MF esp-idf\screen\CMakeFiles\__idf_screen.dir\st7789.c.obj.d -o esp-idf/screen/CMakeFiles/__idf_screen.dir/st7789.c.obj -c E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/include/i2s_lcd_driver.h:17,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.h:23,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/screen_driver.h:18,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c:20:
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated/driver/i2s.h:27:2: warning: #warning "This set of I2S APIs has been deprecated, please include 'driver/i2s_std.h', 'driver/i2s_pdm.h' or 'driver/i2s_tdm.h' instead. if you want to keep using the old APIs and ignore this warning, you can enable 'Suppress leagcy driver deprecated warning' option under 'I2S Configuration' menu in Kconfig" [-Wcpp]
+   27 | #warning "This set of I2S APIs has been deprecated, \
+      |  ^~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c: In function 'lcd_st7789_init':
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c:155:26: error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 'portTICK_PERIOD_MS'?
+  155 |         vTaskDelay(100 / portTICK_RATE_MS);
+      |                          ^~~~~~~~~~~~~~~~
+      |                          portTICK_PERIOD_MS
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c:155:26: note: each undeclared identifier is reported only once for each function it appears in
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c: In function 'lcd_st7789_draw_bitmap':
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c:309:34: error: 'return' with no value, in function returning non-void [-Werror=return-type]
+  309 |     if(y>=ST7789_RESOLUTION_HOR) return;
+      |                                  ^~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c:304:11: note: declared here
+  304 | esp_err_t lcd_st7789_draw_bitmap(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t *bitmap)
+      |           ^~~~~~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c:310:34: error: 'return' with no value, in function returning non-void [-Werror=return-type]
+  310 |     if(y>=ST7789_RESOLUTION_HOR) return;
+      |                                  ^~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.c:304:11: note: declared here
+  304 | esp_err_t lcd_st7789_draw_bitmap(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t *bitmap)
+      |           ^~~~~~~~~~~~~~~~~~~~~~
+cc1.exe: some warnings being treated as errors
+[8/39] Building C object esp-idf/screen/CMakeFiles/__idf_screen.dir/screen_utility/screen_utility.c.obj
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/include/i2s_lcd_driver.h:17,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.h:23,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/screen_driver.h:18,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/screen_utility/screen_utility.h:18,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/screen_utility/screen_utility.c:17:
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated/driver/i2s.h:27:2: warning: #warning "This set of I2S APIs has been deprecated, please include 'driver/i2s_std.h', 'driver/i2s_pdm.h' or 'driver/i2s_tdm.h' instead. if you want to keep using the old APIs and ignore this warning, you can enable 'Suppress leagcy driver deprecated warning' option under 'I2S Configuration' menu in Kconfig" [-Wcpp]
+   27 | #warning "This set of I2S APIs has been deprecated, \
+      |  ^~~~~~~
+[9/39] Building C object esp-idf/decoder_ijg/CMakeFiles/__idf_decoder_ijg.dir/jpeg-9a/jaricom.c.obj
+[10/39] Linking C static library esp-idf\espressif__esp32-camera\libespressif__esp32-camera.a
+[11/39] Building C object esp-idf/screen/CMakeFiles/__idf_screen.dir/zk.c.obj
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/include/i2s_lcd_driver.h:17,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.h:23,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/screen_driver.h:18,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/screen_utility/screen_utility.h:18,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c:8:
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated/driver/i2s.h:27:2: warning: #warning "This set of I2S APIs has been deprecated, please include 'driver/i2s_std.h', 'driver/i2s_pdm.h' or 'driver/i2s_tdm.h' instead. if you want to keep using the old APIs and ignore this warning, you can enable 'Suppress leagcy driver deprecated warning' option under 'I2S Configuration' menu in Kconfig" [-Wcpp]
+   27 | #warning "This set of I2S APIs has been deprecated, \
+      |  ^~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c: In function 'get_n_bytes_data_from_ROM':
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c:52:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
+   52 |         int ret =0;
+      |             ^~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c:51:12: warning: unused variable 'i' [-Wunused-variable]
+   51 |         u8 i;
+      |            ^
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c: In function 'Display_GB2312':
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c:77:24: warning: unused variable 'm' [-Wunused-variable]
+   77 |     u8 i=0,k=0,n=0,d=0,m=0;
+      |                        ^
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c: In function 'Display_Asc':
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c:279:34: warning: unused variable 'm' [-Wunused-variable]
+  279 |     u8 i=0,j=0,k=0,n=0,x0=0,y0=0,m=0;
+      |                                  ^
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c:279:29: warning: variable 'y0' set but not used [-Wunused-but-set-variable]
+  279 |     u8 i=0,j=0,k=0,n=0,x0=0,y0=0,m=0;
+      |                             ^~
+E:/S3class/1_12_camera/1_12_camera/components/screen/zk.c:279:12: warning: unused variable 'j' [-Wunused-variable]
+  279 |     u8 i=0,j=0,k=0,n=0,x0=0,y0=0,m=0;
+      |            ^
+[12/39] Building C object esp-idf/screen/CMakeFiles/__idf_screen.dir/lcd.c.obj
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/include/i2s_lcd_driver.h:17,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.h:23,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/screen_driver.h:18,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/st7789.h:17,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/lcd.c:27:
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated/driver/i2s.h:27:2: warning: #warning "This set of I2S APIs has been deprecated, please include 'driver/i2s_std.h', 'driver/i2s_pdm.h' or 'driver/i2s_tdm.h' instead. if you want to keep using the old APIs and ignore this warning, you can enable 'Suppress leagcy driver deprecated warning' option under 'I2S Configuration' menu in Kconfig" [-Wcpp]
+   27 | #warning "This set of I2S APIs has been deprecated, \
+      |  ^~~~~~~
+[13/39] Building C object esp-idf/decoder_ijg/CMakeFiles/__idf_decoder_ijg.dir/jpeg-9a/jmemmgr.c.obj
+[14/39] Building C object esp-idf/screen/CMakeFiles/__idf_screen.dir/interface_driver/scr_interface_driver.c.obj
+In file included from E:/S3class/1_12_camera/1_12_camera/components/bus/include/i2s_lcd_driver.h:17,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.h:23,
+                 from E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.c:21:
+E:/Espressif/frameworks/esp-idf-v5.1.2/components/driver/deprecated/driver/i2s.h:27:2: warning: #warning "This set of I2S APIs has been deprecated, please include 'driver/i2s_std.h', 'driver/i2s_pdm.h' or 'driver/i2s_tdm.h' instead. if you want to keep using the old APIs and ignore this warning, you can enable 'Suppress leagcy driver deprecated warning' option under 'I2S Configuration' menu in Kconfig" [-Wcpp]
+   27 | #warning "This set of I2S APIs has been deprecated, \
+      |  ^~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.c:82:18: warning: '_i2s_lcd_release' defined but not used [-Wunused-function]
+   82 | static esp_err_t _i2s_lcd_release(void *handle)
+      |                  ^~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.c:72:18: warning: '_i2s_lcd_acquire' defined but not used [-Wunused-function]
+   72 | static esp_err_t _i2s_lcd_acquire(void *handle)
+      |                  ^~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.c:67:18: warning: '_i2s_lcd_read' defined but not used [-Wunused-function]
+   67 | static esp_err_t _i2s_lcd_read(void *handle, uint8_t *data, uint32_t length)
+      |                  ^~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.c:57:18: warning: '_i2s_lcd_write' defined but not used [-Wunused-function]
+   57 | static esp_err_t _i2s_lcd_write(void *handle, const uint8_t *data, uint32_t length)
+      |                  ^~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.c:47:18: warning: '_i2s_lcd_write_cmd' defined but not used [-Wunused-function]
+   47 | static esp_err_t _i2s_lcd_write_cmd(void *handle, uint16_t cmd)
+      |                  ^~~~~~~~~~~~~~~~~~
+E:/S3class/1_12_camera/1_12_camera/components/screen/interface_driver/scr_interface_driver.c:37:18: warning: '_i2s_lcd_write_data' defined but not used [-Wunused-function]
+   37 | static esp_err_t _i2s_lcd_write_data(void *handle, uint16_t data)
+      |                  ^~~~~~~~~~~~~~~~~~~
+ninja: build stopped: subcommand failed.

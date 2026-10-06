@@ -1,0 +1,14 @@
+CMake Error at E:/Espressif/frameworks/esp-idf-v5.1.2/tools/cmake/build.cmake:540 (message):
+  WARNING: Cannot find versions of "espressif/esp32-camera" satisfying
+  "^2.1.8" for the current target "esp32s3".
+
+  HINT: Please check manifest file of the following component(s): main
+
+  ERROR: Because project depends on espressif/esp32-camera (^2.1.8) which
+  doesn't match any versions, version solving failed.
+
+Call Stack (most recent call first):
+  E:/Espressif/frameworks/esp-idf-v5.1.2/tools/cmake/project.cmake:547 (idf_build_process)
+  CMakeLists.txt:13 (project)
+
+

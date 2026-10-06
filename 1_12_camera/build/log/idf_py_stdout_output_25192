@@ -1,0 +1,19 @@
+[1/13] Performing build step for 'bootloader'
+[1/1] cmd.exe /C "cd /D E:\S3class\1_12_camera\1_12_camera\build\bootloader\esp-idf\esptool_py && E:\Espressif\python_env\idf5.1_py3.11_env\Scripts\python.exe E:/Espressif/frameworks/esp-idf-v5.1.2/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 E:/S3class/1_12_camera/1_12_camera/build/bootloader/bootloader.bin"
+Bootloader binary size 0x5770 bytes. 0x2890 bytes (32%) free.
+[2/11] Building C object esp-idf/bus/CMakeFiles/__idf_bus.dir/spi_bus.c.obj
+[3/11] Building C object esp-idf/bus/CMakeFiles/__idf_bus.dir/i2c_bus.c.obj
+[4/11] Linking C static library esp-idf\bus\libbus.a
+[5/11] Linking C static library esp-idf\screen\libscreen.a
+[6/11] Linking C static library esp-idf\main\libmain.a
+[7/11] Generating ld/sections.ld
+[8/11] Building C object CMakeFiles/esp32s3-camera.elf.dir/project_elf_src_esp32s3.c.obj
+[9/11] Linking CXX executable esp32s3-camera.elf
+[10/11] Generating binary image from built executable
+esptool.py v4.7.0
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Generated E:/S3class/1_12_camera/1_12_camera/build/esp32s3-camera.bin
+[11/11] cmd.exe /C "cd /D E:\S3class\1_12_camera\1_12_camera\build\esp-idf\esptool_py && E:\Espressif\python_env\idf5.1_py3.11_env\Scripts\python.exe E:/Espressif/frameworks/esp-idf-v5.1.2/components/partition_table/check_sizes.py --offset 0x8000 partition --type app E:/S3class/1_12_camera/1_12_camera/build/partition_table/partition-table.bin E:/S3class/1_12_camera/1_12_camera/build/esp32s3-camera.bin"
+esp32s3-camera.bin binary size 0x544d0 bytes. Smallest app partition is 0x100000 bytes. 0xabb30 bytes (67%) free.

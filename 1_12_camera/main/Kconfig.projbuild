@@ -1,0 +1,6 @@
+menu "Example Configuration"
+    
+    config  CAMERA_JPEG_MODE
+        bool "jpeg mode"
+        
+endmenu

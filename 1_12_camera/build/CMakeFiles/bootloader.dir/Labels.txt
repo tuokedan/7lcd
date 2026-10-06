@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+E:/S3class/1_12_camera/1_12_camera/build/CMakeFiles/bootloader
+E:/S3class/1_12_camera/1_12_camera/build/CMakeFiles/bootloader.rule
+E:/S3class/1_12_camera/1_12_camera/build/CMakeFiles/bootloader-complete.rule
+E:/S3class/1_12_camera/1_12_camera/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+E:/S3class/1_12_camera/1_12_camera/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+E:/S3class/1_12_camera/1_12_camera/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+E:/S3class/1_12_camera/1_12_camera/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+E:/S3class/1_12_camera/1_12_camera/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+E:/S3class/1_12_camera/1_12_camera/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+E:/S3class/1_12_camera/1_12_camera/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
