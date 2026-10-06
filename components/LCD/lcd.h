@@ -11,7 +11,6 @@
 /* ESP32-S3 V1.4 原理图对应的 LCD 引脚 */
 #define LCD_RST(x)  gpio_set_level(GPIO_NUM_2,  (x) ? 1 : 0)
 #define LCD_DC(x)   gpio_set_level(GPIO_NUM_41, (x) ? 1 : 0)
-#define LCD_CS(x)   gpio_set_level(GPIO_NUM_45, (x) ? 1 : 0)
 
 /*
  * 原理图没有独立 LCD 背光 GPIO。
