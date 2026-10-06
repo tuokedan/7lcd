@@ -8,17 +8,12 @@ CONFIG_SPIRAM_SPEED_40M=y
 CONFIG_SPIRAM_USE_MALLOC=y
 CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
 
-# ESP-DL COCO Detect: keep only the 320x320 INT8 YOLO11n model.
-CONFIG_FLASH_COCO_DETECT_YOLO11N_S8_V1=n
-CONFIG_FLASH_COCO_DETECT_YOLO11N_320_S8_V1=y
-CONFIG_COCO_DETECT_YOLO11N_320_S8_V1=y
-CONFIG_COCO_DETECT_MODEL_IN_FLASH_PARTITION=y
+# Espressif lightweight Pedestrian Detect PICO_S8_V1.
+# ESP32-S3 input: 224x224x3, model latency about 118.3 ms.
+CONFIG_FLASH_PEDESTRIAN_DETECT_PICO_S8_V1=y
+CONFIG_PEDESTRIAN_DETECT_PICO_S8_V1=y
+CONFIG_PEDESTRIAN_DETECT_MODEL_IN_FLASH_PARTITION=y
 
 # Use an 8 MB-compatible custom partition table
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions-8MiB.csv"
-
-# YOLO11n inference occupies CPU1 for several seconds on ESP32-S3.
-# Keep the CPU0 camera/LCD task responsive and do not treat CPU1 idle starvation
-# as a watchdog fault while the dedicated inference task is running.
-CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n
