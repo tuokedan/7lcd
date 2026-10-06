@@ -9,7 +9,6 @@ esp_err_t spi2_init(void)
 {
     spi_bus_config_t bus_cfg = {
         .flags = SPICOMMON_BUSFLAG_MASTER,
-        .isr_cpu_id = INTR_CPU_ID_AUTO,
         .max_transfer_sz = 320 * 240 * 2,
         .miso_io_num = GPIO_NUM_47,
         .mosi_io_num = GPIO_NUM_48,
