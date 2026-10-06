@@ -5,7 +5,7 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 
-#define LCD_WIDTH   240
+#define LCD_WIDTH   320
 #define LCD_HEIGHT  240
 
 /* ESP32-S3 V1.4 原理图对应的 LCD 引脚 */
