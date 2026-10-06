@@ -7,6 +7,7 @@
 #include "esp_err.h"
 
 #define LCD_BUF_SIZE 11520
+#define LCD_TOTAL_BYTES ((size_t)LCD_WIDTH * LCD_HEIGHT * 2)
 
 static uint8_t lcd_buf[LCD_BUF_SIZE];
 
@@ -109,8 +110,12 @@ void lcd_clear(uint16_t color)
     lcd_set_window(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
     lcd_fill_buffer(color);
 
-    for (int i = 0; i < (LCD_WIDTH * LCD_HEIGHT * 2) / LCD_BUF_SIZE; ++i) {
-        lcd_write_datan(lcd_buf, LCD_BUF_SIZE);
+    for (size_t offset = 0; offset < LCD_TOTAL_BYTES; offset += LCD_BUF_SIZE) {
+        size_t chunk = LCD_TOTAL_BYTES - offset;
+        if (chunk > LCD_BUF_SIZE) {
+            chunk = LCD_BUF_SIZE;
+        }
+        lcd_write_datan(lcd_buf, chunk);
     }
 }
 
@@ -359,9 +364,11 @@ void lcd_show_picture(uint8_t *img)
 
     lcd_set_window(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
 
-    for (size_t offset = 0;
-         offset < LCD_WIDTH * LCD_HEIGHT * 2;
-         offset += LCD_BUF_SIZE) {
-        lcd_write_datan(img + offset, LCD_BUF_SIZE);
+    for (size_t offset = 0; offset < LCD_TOTAL_BYTES; offset += LCD_BUF_SIZE) {
+        size_t chunk = LCD_TOTAL_BYTES - offset;
+        if (chunk > LCD_BUF_SIZE) {
+            chunk = LCD_BUF_SIZE;
+        }
+        lcd_write_datan(img + offset, chunk);
     }
 }
