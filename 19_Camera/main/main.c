@@ -4,13 +4,12 @@
 #include "lcd.h"
 
 void app_main(void)
-{ 
+{
     lcd_init();
     camera_init();
 
-    while (1)
-    {
-        camera_show(0,0);              /* 显示图像 */
-        vTaskDelay(5);
+    while (1) {
+        camera_show(0, 0);
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
