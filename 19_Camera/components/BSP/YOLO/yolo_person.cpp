@@ -1,6 +1,6 @@
 #include "yolo_person.h"
 
-#include "coco_detect.hpp"
+#include "pedestrian_detect.hpp"
 #include "dl_image_define.hpp"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -21,7 +21,7 @@ static constexpr size_t FRAME_BYTES =
     static_cast<size_t>(FRAME_WIDTH) * FRAME_HEIGHT * 2;
 static constexpr int BUFFER_COUNT = 2;
 
-static COCODetect *s_detector = nullptr;
+static PedestrianDetect *s_detector = nullptr;
 static uint8_t *s_frame_buffers[BUFFER_COUNT] = {nullptr, nullptr};
 
 /* 0=空闲，1=已排队，2=正在推理。 */
@@ -72,7 +72,7 @@ static void yolo_task(void *arg)
 {
     (void)arg;
 
-    ESP_LOGI(TAG, "YOLO background task started on CPU%d",
+    ESP_LOGI(TAG, "Pedestrian detection task started on CPU%d",
              xPortGetCoreID());
 
     while (true) {
@@ -83,8 +83,7 @@ static void yolo_task(void *arg)
         }
 
         /*
-         * 如果队列里已经积压了旧帧，只保留最后一帧。
-         * 这样检测结果尽量接近当前画面，而不是处理几秒前的画面。
+         * 如果队列里已经有更新的帧，只保留最新帧，避免检测结果滞后。
          */
         uint8_t newer_index = 0;
         while (xQueueReceive(s_frame_queue, &newer_index, 0) == pdTRUE) {
@@ -124,10 +123,6 @@ static void yolo_task(void *arg)
 
         release_buffer(index);
 
-        /*
-         * 让出一点调度时间。YOLO 本身的卷积计算仍然很重，
-         * 但它已经与摄像头/LCD主任务分离。
-         */
         vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
@@ -139,12 +134,12 @@ extern "C" void yolo_person_init(void)
     }
 
     ESP_LOGI(TAG,
-             "Initializing ESP-DL COCO YOLO11n 320x320 INT8 detector...");
+             "Initializing Espressif Pedestrian Detect PICO_S8_V1...");
 
-    s_detector = new COCODetect(COCODetect::YOLO11N_320_S8_V1);
+    s_detector = new PedestrianDetect(PedestrianDetect::PICO_S8_V1);
 
     if (s_detector == nullptr) {
-        ESP_LOGE(TAG, "Failed to allocate COCODetect");
+        ESP_LOGE(TAG, "Failed to allocate PedestrianDetect");
         return;
     }
 
@@ -154,7 +149,7 @@ extern "C" void yolo_person_init(void)
                              MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
 
         if (s_frame_buffers[i] == nullptr) {
-            ESP_LOGE(TAG, "Failed to allocate YOLO frame buffer %d", i);
+            ESP_LOGE(TAG, "Failed to allocate frame buffer %d", i);
 
             for (int j = 0; j < i; ++j) {
                 heap_caps_free(s_frame_buffers[j]);
@@ -169,7 +164,7 @@ extern "C" void yolo_person_init(void)
 
     s_frame_queue = xQueueCreate(BUFFER_COUNT, sizeof(uint8_t));
     if (s_frame_queue == nullptr) {
-        ESP_LOGE(TAG, "Failed to create YOLO frame queue");
+        ESP_LOGE(TAG, "Failed to create frame queue");
 
         for (int i = 0; i < BUFFER_COUNT; ++i) {
             heap_caps_free(s_frame_buffers[i]);
@@ -183,15 +178,16 @@ extern "C" void yolo_person_init(void)
 
     BaseType_t task_ok = xTaskCreatePinnedToCore(
         yolo_task,
-        "yolo_task",
-        12288,
+        "ped_detect",
+        8192,
         nullptr,
         5,
         nullptr,
         1);
 
     if (task_ok != pdPASS) {
-        ESP_LOGE(TAG, "Failed to create YOLO background task");
+        ESP_LOGE(TAG, "Failed to create pedestrian detection task");
+
         vQueueDelete(s_frame_queue);
         s_frame_queue = nullptr;
 
@@ -205,9 +201,9 @@ extern "C" void yolo_person_init(void)
         return;
     }
 
-    ESP_LOGI(TAG, "ESP-DL detector initialized");
-    ESP_LOGI(TAG, "Target class: person (COCO class 0)");
-    ESP_LOGI(TAG, "YOLO task uses CPU1; camera/LCD remain on CPU0");
+    ESP_LOGI(TAG, "Pedestrian detector initialized");
+    ESP_LOGI(TAG, "Target: pedestrian/person");
+    ESP_LOGI(TAG, "PICO input: 224x224, inference runs on CPU1");
 }
 
 extern "C" bool yolo_person_submit_frame(const uint8_t *rgb565,
@@ -279,7 +275,7 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
         .data = const_cast<uint8_t *>(rgb565),
         .width = static_cast<int>(width),
         .height = static_cast<int>(height),
-        .pix_type = dl::image::DL_IMAGE_PIX_TYPE_RGB565,
+        .pix_type = dl::image::DL_IMAGE_PIX_TYPE_RGB565BE,
     };
 
     std::list<dl::detect::result_t> &results = s_detector->run(image);
@@ -288,8 +284,7 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
     float best_score = 0.0f;
 
     for (const auto &result : results) {
-        if (result.category != YOLO_PERSON_CLASS ||
-            result.box.size() < 4) {
+        if (result.box.size() < 4) {
             continue;
         }
 
@@ -302,7 +297,7 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
         detection->x2 = static_cast<float>(result.box[2]);
         detection->y2 = static_cast<float>(result.box[3]);
         detection->confidence = result.score;
-        detection->class_id = result.category;
+        detection->class_id = YOLO_PERSON_CLASS;
 
         best_score = result.score;
         found_person = true;
