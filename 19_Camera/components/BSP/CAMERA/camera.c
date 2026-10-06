@@ -5,6 +5,7 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "lcd.h"
+#include "yolo_person.h"
 
 static const char *TAG = "camera";
 
@@ -74,6 +75,13 @@ void camera_show(uint16_t x, uint16_t y)
                  fb->width, fb->height, fb->format);
         esp_camera_fb_return(fb);
         return;
+    }
+
+    yolo_detection_t detection;
+    if (yolo_person_detect_rgb565(fb->buf, fb->width, fb->height, &detection)) {
+        ESP_LOGI(TAG, "person conf=%.2f bbox=(%.0f,%.0f)-(%.0f,%.0f)",
+                 detection.confidence, detection.x1, detection.y1,
+                 detection.x2, detection.y2);
     }
 
     lcd_set_window(x, y, x + fb->width - 1, y + fb->height - 1);
