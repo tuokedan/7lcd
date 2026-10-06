@@ -53,8 +53,7 @@ static inline void draw_pixel_rgb565(uint8_t *buf,
         return;
     }
 
-    size_t offset = (static_cast<size_t>(y) * width +
-                     static_cast<size_t>(x)) * 2;
+    size_t offset = ((size_t)y * width + (size_t)x) * 2;
 
     buf[offset] = (uint8_t)(color >> 8);
     buf[offset + 1] = (uint8_t)(color & 0xFF);
