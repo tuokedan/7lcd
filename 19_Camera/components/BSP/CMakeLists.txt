@@ -1,16 +1,19 @@
 set(src_dirs
             CAMERA
             LCD
-            SPI)
+            SPI
+            YOLO)
 
 set(include_dirs
             CAMERA
             LCD
-            SPI)
+            SPI
+            YOLO)
 
 set(requires
             driver
-            esp32-camera)
+            esp32-camera
+            log)
 
 idf_component_register(
     SRC_DIRS ${src_dirs}
