@@ -132,7 +132,6 @@ void lcd_init(void)
 
     lcd_gpio_init();
 
-    LCD_CS(1);
     LCD_DC(1);
     lcd_hard_reset();
 
