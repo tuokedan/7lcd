@@ -144,24 +144,28 @@ static esp_err_t es8388_init(void)
         {ES8388_CONTROL1,    0x12},
         {ES8388_DACCONTROL1, 0x18}, /* I2S, 16-bit */
         {ES8388_DACCONTROL2, 0x02}, /* MCLK/LRCK = 256 */
-        {ES8388_DACCONTROL16,0x00}, /* LIN1/RIN1 input path */
-        {ES8388_DACCONTROL17,0x90},
-        {ES8388_DACCONTROL20,0x90},
-        {ES8388_DACCONTROL21,0x80},
+        /* DAC output path: enable both left/right DAC mixers and line outputs. */
+        {ES8388_DACCONTROL16,0x00}, /* LIN1/RIN1 ADC path */
+        {ES8388_DACCONTROL17,0x90}, /* left DAC -> left mixer, 0 dB */
+        {ES8388_DACCONTROL20,0x90}, /* right DAC -> right mixer, 0 dB */
+        {ES8388_DACCONTROL21,0x80}, /* ADC and DAC use the same LRCK */
         {ES8388_DACCONTROL23,0x00},
-        {ES8388_DACCONTROL24,0x1E},
-        {ES8388_DACCONTROL25,0x1E},
-        {ES8388_DACCONTROL26,0x00},
-        {ES8388_DACCONTROL27,0x00},
+        {ES8388_DACCONTROL24,0x1E}, /* LOUT1 0 dB */
+        {ES8388_DACCONTROL25,0x1E}, /* ROUT1 0 dB */
+        {ES8388_DACCONTROL26,0x1E}, /* LOUT2 0 dB */
+        {ES8388_DACCONTROL27,0x1E}, /* ROUT2 0 dB */
+        {ES8388_DACCONTROL4, 0x00}, /* DAC digital volume: 0 dB */
+        {ES8388_DACCONTROL5, 0x00}, /* DAC digital volume: 0 dB */
 
+        /* ADC: power down while configuring, then explicitly power it up. */
         {ES8388_ADCPOWER,    0xFF},
         {ES8388_ADCCONTROL1, 0x77}, /* +21 dB PGA */
-        {ES8388_ADCCONTROL2, 0x00}, /* LIN1/RIN1 */
+        {ES8388_ADCCONTROL2, 0x00}, /* LIN1/RIN1: board MIC1/MIC2 path */
         {ES8388_ADCCONTROL3, 0x02},
         {ES8388_ADCCONTROL4, 0x0C}, /* I2S, 16-bit */
         {ES8388_ADCCONTROL5, 0x02}, /* MCLK/LRCK = 256 */
-        {ES8388_ADCCONTROL8, 0x00},
-        {ES8388_ADCCONTROL9, 0x00},
+        {ES8388_ADCCONTROL8, 0x00}, /* ADC digital volume: 0 dB */
+        {ES8388_ADCCONTROL9, 0x00}, /* ADC digital volume: 0 dB */
 
         /* Voice-oriented ALC */
         {ES8388_ADCCONTROL10,0xEA},
@@ -170,8 +174,11 @@ static esp_err_t es8388_init(void)
         {ES8388_ADCCONTROL13,0x06},
         {ES8388_ADCCONTROL14,0xC3},
 
+        /* 0x3C enables DAC + LOUT1/ROUT1 + LOUT2/ROUT2. */
         {ES8388_DACPOWER,    0x3C},
-        {ES8388_DACCONTROL3, 0x00},
+        {ES8388_DACCONTROL3, 0x00}, /* DAC unmute */
+        /* 0x09 = ADC on, LIN1/RIN1 enabled, MICBIAS off, low-power INT1LP. */
+        {ES8388_ADCPOWER,    0x09},
     };
 
     for (size_t i = 0; i < sizeof(init_regs) / sizeof(init_regs[0]); ++i) {
