@@ -8,7 +8,6 @@
 #define LCD_WIDTH   320
 #define LCD_HEIGHT  240
 
-/* ESP32-S3 V1.4 原理图对应的 LCD 引脚 */
 #define LCD_RST(x)  gpio_set_level(GPIO_NUM_2,  (x) ? 1 : 0)
 #define LCD_DC(x)   gpio_set_level(GPIO_NUM_41, (x) ? 1 : 0)
 
@@ -58,5 +57,9 @@ void lcd_show_hexnum(uint8_t line, uint8_t column, uint32_t number, uint8_t leng
 void lcd_show_float(uint8_t line, uint8_t column, float number, uint8_t length,
                    uint16_t fontcolor, uint16_t backgroundcolor);
 void lcd_show_picture(uint8_t *img);
+
+/* 运行期 LCD SPI 互斥锁：摄像头显示和 PC 回传显示不能同时操作 SPI。 */
+void lcd_lock(void);
+void lcd_unlock(void);
 
 #endif
