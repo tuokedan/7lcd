@@ -4,12 +4,28 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "esp_err.h"
 
 #define LCD_BUF_SIZE 11520
 #define LCD_TOTAL_BYTES ((size_t)LCD_WIDTH * LCD_HEIGHT * 2)
 
 static uint8_t lcd_buf[LCD_BUF_SIZE];
+static SemaphoreHandle_t s_lcd_mutex = NULL;
+
+void lcd_lock(void)
+{
+    if (s_lcd_mutex != NULL) {
+        xSemaphoreTake(s_lcd_mutex, portMAX_DELAY);
+    }
+}
+
+void lcd_unlock(void)
+{
+    if (s_lcd_mutex != NULL) {
+        xSemaphoreGive(s_lcd_mutex);
+    }
+}
 
 void lcd_write_cmd(uint8_t cmd)
 {
@@ -64,8 +80,6 @@ static void lcd_gpio_init(void)
         .pull_up_en = GPIO_PULLUP_ENABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&io));
-
-    /* GPIO42 是 LCD_CLK，由 SPI 外设接管，不能配置成背光 GPIO。 */
 }
 
 static void lcd_fill_buffer(uint16_t color)
@@ -139,8 +153,6 @@ void lcd_init(void)
 
     LCD_DC(1);
     lcd_hard_reset();
-
-    /* 无独立背光 GPIO；背光由显示屏接口硬件供电。 */
     vTaskDelay(pdMS_TO_TICKS(20));
 
     lcd_write_cmd(0x11);
@@ -227,6 +239,11 @@ void lcd_init(void)
     lcd_write_cmd(0x29);
     lcd_write_cmd(0x2C);
 
+    s_lcd_mutex = xSemaphoreCreateMutex();
+    if (s_lcd_mutex == NULL) {
+        ESP_LOGE("lcd", "LCD mutex create failed");
+    }
+
     lcd_clear(BLACK);
 }
 
@@ -296,79 +313,58 @@ void lcd_show_string(uint8_t line, uint8_t column, char *string,
 static uint32_t lcd_pow(uint32_t x, uint32_t y)
 {
     uint32_t result = 1;
-
-    while (y--) {
-        result *= x;
-    }
-
+    while (y--) result *= x;
     return result;
 }
 
-void lcd_show_num(uint8_t line, uint8_t column, uint32_t number,
-                  uint8_t length, uint16_t fontcolor,
-                  uint16_t backgroundcolor)
+void lcd_show_num(uint8_t line, uint8_t column, uint32_t number, uint8_t length,
+                  uint16_t fontcolor, uint16_t backgroundcolor)
 {
     for (uint8_t i = 0; i < length; ++i) {
         uint32_t divisor = lcd_pow(10, length - i - 1);
         uint8_t digit = (number / divisor) % 10;
-
-        lcd_show_char(line, column + i, digit + '0',
-                      fontcolor, backgroundcolor);
+        lcd_show_char(line, column + i, digit + '0', fontcolor, backgroundcolor);
     }
 }
 
-void lcd_show_hexnum(uint8_t line, uint8_t column, uint32_t number,
-                     uint8_t length, uint16_t fontcolor,
-                     uint16_t backgroundcolor)
+void lcd_show_hexnum(uint8_t line, uint8_t column, uint32_t number, uint8_t length,
+                     uint16_t fontcolor, uint16_t backgroundcolor)
 {
     for (uint8_t i = 0; i < length; ++i) {
         uint8_t digit = (number / lcd_pow(16, length - i - 1)) % 16;
         uint8_t chr = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
-
-        lcd_show_char(line, column + i, chr,
-                      fontcolor, backgroundcolor);
+        lcd_show_char(line, column + i, chr, fontcolor, backgroundcolor);
     }
 }
 
-void lcd_show_float(uint8_t line, uint8_t column, float number,
-                    uint8_t length, uint16_t fontcolor,
-                    uint16_t backgroundcolor)
+void lcd_show_float(uint8_t line, uint8_t column, float number, uint8_t length,
+                    uint16_t fontcolor, uint16_t backgroundcolor)
 {
-    if (length < 3) {
-        return;
-    }
+    if (length < 3) return;
 
     uint32_t number1 = (uint32_t)(number * 100.0f);
-
     for (uint8_t i = 0; i < length; ++i) {
         if (i == length - 2) {
-            lcd_show_char(line, column + i, '.',
-                          fontcolor, backgroundcolor);
+            lcd_show_char(line, column + i, '.', fontcolor, backgroundcolor);
             continue;
         }
 
         uint8_t digit_pos = (i < length - 2) ? i : i - 1;
         uint32_t divisor = lcd_pow(10, length - 2 - digit_pos);
         uint8_t digit = (number1 / divisor) % 10;
-
-        lcd_show_char(line, column + i, digit + '0',
-                      fontcolor, backgroundcolor);
+        lcd_show_char(line, column + i, digit + '0', fontcolor, backgroundcolor);
     }
 }
 
 void lcd_show_picture(uint8_t *img)
 {
-    if (img == NULL) {
-        return;
-    }
+    if (img == NULL) return;
 
     lcd_set_window(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
 
     for (size_t offset = 0; offset < LCD_TOTAL_BYTES; offset += LCD_BUF_SIZE) {
         size_t chunk = LCD_TOTAL_BYTES - offset;
-        if (chunk > LCD_BUF_SIZE) {
-            chunk = LCD_BUF_SIZE;
-        }
+        if (chunk > LCD_BUF_SIZE) chunk = LCD_BUF_SIZE;
         lcd_write_datan(img + offset, chunk);
     }
 }
