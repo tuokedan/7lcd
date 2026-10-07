@@ -2,7 +2,7 @@
 ESP32-S3 bidirectional video test.
 
 PC camera -> ESP32 LCD:
-    POST http://192.168.4.1/pcvideo
+    POST http://192.168.4.1:81/pcvideo
 
 ESP32 camera -> PC:
     GET  http://192.168.4.1/video
@@ -26,7 +26,7 @@ import cv2
 import numpy as np
 
 ESP32_HOST = "192.168.4.1"
-PC_TO_ESP32_URL = f"http://{ESP32_HOST}/pcvideo"
+PC_TO_ESP32_URL = f"http://{ESP32_HOST}:81/pcvideo"
 ESP32_TO_PC_URL = f"http://{ESP32_HOST}/video"
 
 CAMERA_INDEX = 0
