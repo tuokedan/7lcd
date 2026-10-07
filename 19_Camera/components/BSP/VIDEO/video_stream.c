@@ -229,6 +229,71 @@ static esp_err_t video_stream_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+static void start_wifi_ap(void)
+{
+    esp_err_t ret = esp_netif_init();
+    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "esp_netif_init failed: 0x%x", ret);
+        return;
+    }
+
+    ret = esp_event_loop_create_default();
+    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "esp_event_loop_create_default failed: 0x%x", ret);
+        return;
+    }
+
+    esp_netif_t *ap_netif = esp_netif_create_default_wifi_ap();
+    if (ap_netif == NULL) {
+        ESP_LOGE(TAG, "Failed to create default Wi-Fi AP netif");
+        return;
+    }
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ret = esp_wifi_init(&cfg);
+    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "esp_wifi_init failed: 0x%x", ret);
+        return;
+    }
+
+    wifi_config_t wifi_config = {};
+    memcpy(wifi_config.ap.ssid, VIDEO_AP_SSID, sizeof(VIDEO_AP_SSID) - 1);
+    memcpy(wifi_config.ap.password, VIDEO_AP_PASSWORD, sizeof(VIDEO_AP_PASSWORD) - 1);
+    wifi_config.ap.ssid_len = sizeof(VIDEO_AP_SSID) - 1;
+    wifi_config.ap.channel = 1;
+    wifi_config.ap.max_connection = 2;
+    wifi_config.ap.authmode = WIFI_AUTH_WPA2_PSK;
+    wifi_config.ap.pmf_cfg.required = false;
+
+    ret = esp_wifi_set_mode(WIFI_MODE_AP);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "esp_wifi_set_mode failed: 0x%x", ret);
+        return;
+    }
+
+    ret = esp_wifi_set_config(WIFI_IF_AP, &wifi_config);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "esp_wifi_set_config failed: 0x%x", ret);
+        return;
+    }
+
+    ret = esp_wifi_set_ps(WIFI_PS_NONE);
+    if (ret != ESP_OK) {
+        ESP_LOGW(TAG, "esp_wifi_set_ps(WIFI_PS_NONE) failed: 0x%x", ret);
+    }
+
+    ret = esp_wifi_start();
+    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "esp_wifi_start failed: 0x%x", ret);
+        return;
+    }
+
+    ESP_LOGI(TAG, "Wi-Fi AP started");
+    ESP_LOGI(TAG, "SSID: %s", VIDEO_AP_SSID);
+    ESP_LOGI(TAG, "Password: %s", VIDEO_AP_PASSWORD);
+    ESP_LOGI(TAG, "AP IP: 192.168.4.1");
+}
+
 static void start_http_server(void)
 {
     /*
