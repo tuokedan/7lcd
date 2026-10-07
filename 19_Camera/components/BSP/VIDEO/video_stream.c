@@ -1,6 +1,7 @@
 #include "video_stream.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #include "esp_event.h"
 #include "esp_heap_caps.h"
@@ -133,9 +134,7 @@ static esp_err_t video_stream_handler(httpd_req_t *req)
         }
 
         if (buffer_index < 0) {
-            if (httpd_req_to_sockfd(req) < 0) {
-                break;
-            }
+            vTaskDelay(pdMS_TO_TICKS(20));
             continue;
         }
 
