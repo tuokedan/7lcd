@@ -63,3 +63,47 @@ OV2640 → ESP32-S3 → Wi-Fi热点 → Windows PC
 - 双向音频
 
 即可逐步变成简易视频对话设备。
+
+
+## 5. 第二阶段：PC摄像头 → ESP32 LCD
+
+现在已经加入反向视频链路：
+
+PC摄像头 → JPEG → Wi-Fi → ESP32 → JPEG解码 → RGB565 → LCD
+
+ESP32新增接口：
+
+    POST http://192.168.4.1/pcvideo
+
+电脑端运行：
+
+    cd E:\7_LCDDisplay11\19_Camera\tools
+    python pc_video_sender.py
+
+使用步骤：
+
+1. ESP32 启动并创建 ESP32-CAM-Video 热点。
+2. Windows 连接该热点，密码仍为 12345678。
+3. 保持 Python 依赖已安装。
+4. 运行 pc_video_sender.py。
+5. PC 会显示本机摄像头预览。
+6. ESP32 的 ST7789 LCD 应显示 PC 摄像头画面。
+7. 按 Q 或 ESC 退出。
+
+当前反向视频约 8 FPS，PC端 JPEG 质量 55，固定发送 320×240。
+
+## 6. 双向视频测试
+
+ESP32 已允许最多 2 个 Wi-Fi 客户端连接，因此后续可以同时运行：
+
+- pc_video_receiver.py：查看 ESP32 摄像头
+- pc_video_sender.py：把 PC 摄像头送到 ESP32 LCD
+
+这样就形成：
+
+PC摄像头 → ESP32 LCD
+ESP32摄像头 → PC窗口
+
+也就是双向视频的第一版。
+
+当前还没有加入音频；下一阶段再增加麦克风/扬声器和双向音频。
