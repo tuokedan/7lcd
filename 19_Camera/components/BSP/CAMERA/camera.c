@@ -6,6 +6,7 @@
 #include "driver/gpio.h"
 #include "lcd.h"
 #include "yolo_person.h"
+#include "video_stream.h"
 
 #include <stdint.h>
 
@@ -175,6 +176,8 @@ void camera_show(uint16_t x, uint16_t y)
         lcd_write_datan(fb->buf + offset, (uint16_t)chunk);
         offset += chunk;
     }
+
+    video_stream_publish_frame(fb);
 
     esp_camera_fb_return(fb);
 }
