@@ -6,6 +6,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "esp_err.h"
+#include "esp_log.h"
 
 #define LCD_BUF_SIZE 11520
 #define LCD_TOTAL_BYTES ((size_t)LCD_WIDTH * LCD_HEIGHT * 2)
