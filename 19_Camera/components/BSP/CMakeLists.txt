@@ -2,19 +2,22 @@ set(src_dirs
             CAMERA
             LCD
             SPI
-            YOLO)
+            YOLO
+            VIDEO)
 
 set(include_dirs
             CAMERA
             LCD
             SPI
-            YOLO)
+            YOLO
+            VIDEO)
 
 set(requires
             driver
             esp32-camera
             log
-            pedestrian_detect)
+            pedestrian_detect
+            video_stream)
 
 idf_component_register(
     SRC_DIRS ${src_dirs}
