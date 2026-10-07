@@ -229,31 +229,41 @@ static esp_err_t video_stream_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-static void start_wifi_ap(void)
+static bool start_wifi_ap(void)
 {
-    esp_err_t ret = esp_netif_init();
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "nvs_flash_init failed: 0x%x", ret);
+        return false;
+    }
+
+    ret = esp_netif_init();
     if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
         ESP_LOGE(TAG, "esp_netif_init failed: 0x%x", ret);
-        return;
+        return false;
     }
 
     ret = esp_event_loop_create_default();
     if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
         ESP_LOGE(TAG, "esp_event_loop_create_default failed: 0x%x", ret);
-        return;
+        return false;
     }
 
     esp_netif_t *ap_netif = esp_netif_create_default_wifi_ap();
     if (ap_netif == NULL) {
         ESP_LOGE(TAG, "Failed to create default Wi-Fi AP netif");
-        return;
+        return false;
     }
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ret = esp_wifi_init(&cfg);
     if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
         ESP_LOGE(TAG, "esp_wifi_init failed: 0x%x", ret);
-        return;
+        return false;
     }
 
     wifi_config_t wifi_config = {};
@@ -268,13 +278,13 @@ static void start_wifi_ap(void)
     ret = esp_wifi_set_mode(WIFI_MODE_AP);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "esp_wifi_set_mode failed: 0x%x", ret);
-        return;
+        return false;
     }
 
     ret = esp_wifi_set_config(WIFI_IF_AP, &wifi_config);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "esp_wifi_set_config failed: 0x%x", ret);
-        return;
+        return false;
     }
 
     ret = esp_wifi_set_ps(WIFI_PS_NONE);
@@ -285,13 +295,14 @@ static void start_wifi_ap(void)
     ret = esp_wifi_start();
     if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
         ESP_LOGE(TAG, "esp_wifi_start failed: 0x%x", ret);
-        return;
+        return false;
     }
 
     ESP_LOGI(TAG, "Wi-Fi AP started");
     ESP_LOGI(TAG, "SSID: %s", VIDEO_AP_SSID);
     ESP_LOGI(TAG, "Password: %s", VIDEO_AP_PASSWORD);
     ESP_LOGI(TAG, "AP IP: 192.168.4.1");
+    return true;
 }
 
 static void start_http_server(void)
@@ -398,7 +409,11 @@ void video_stream_init(void)
         return;
     }
 
-    start_wifi_ap();
+    if (!start_wifi_ap()) {
+        ESP_LOGE(TAG, "Wi-Fi AP startup failed; video HTTP servers will not start");
+        return;
+    }
+
     start_http_server();
 
     s_started = true;
