@@ -17,7 +17,11 @@ set(requires
             esp32-camera
             log
             pedestrian_detect
-            video_stream)
+            esp_http_server
+            esp_wifi
+            esp_event
+            esp_netif
+            nvs_flash)
 
 idf_component_register(
     SRC_DIRS ${src_dirs}
