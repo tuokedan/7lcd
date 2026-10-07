@@ -191,7 +191,6 @@ static esp_err_t audio_i2s_init(void)
         .use_apll = false,
         .tx_desc_auto_clear = true,
         .fixed_mclk = 0,
-        .mclk_multiple = I2S_MCLK_MULTIPLE_256,
     };
 
     i2s_pin_config_t pins = {
