@@ -345,6 +345,8 @@ static void start_http_server(void)
 
     httpd_config_t pc_config = HTTPD_DEFAULT_CONFIG();
     pc_config.server_port = VIDEO_HTTP_PORT + 1;
+    /* Each httpd instance also needs its own internal control socket port. */
+    pc_config.ctrl_port = 32769;
     pc_config.max_uri_handlers = 1;
     pc_config.stack_size = 8192;
 
