@@ -149,7 +149,8 @@ static esp_err_t es8388_init(void)
         /* ADC configuration. */
         {ES8388_ADCPOWER,    0xFF},
         {ES8388_ADCCONTROL1, 0xBB},
-        {ES8388_ADCCONTROL2, 0x50},
+        /* Schematic: MIC1 is connected to ES8388 LIN1. */
+        {ES8388_ADCCONTROL2, 0x05},
         {ES8388_ADCCONTROL3, 0x02},
         {ES8388_ADCCONTROL4, 0x0C},
         {ES8388_ADCCONTROL5, 0x02},
