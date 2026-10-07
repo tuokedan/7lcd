@@ -159,8 +159,8 @@ static esp_err_t es8388_init(void)
 
         /* ADC: power down while configuring, then explicitly power it up. */
         {ES8388_ADCPOWER,    0xFF},
-        {ES8388_ADCCONTROL1, 0x77}, /* +21 dB PGA */
-        {ES8388_ADCCONTROL2, 0x00}, /* LIN1/RIN1: board MIC1/MIC2 path */
+        {ES8388_ADCCONTROL1, 0xBB}, /* ADC PGA: 0 dB, normal stereo input */
+        {ES8388_ADCCONTROL2, 0x50}, /* LIN1/RIN1 input, common-mode/differential mic path */
         {ES8388_ADCCONTROL3, 0x02},
         {ES8388_ADCCONTROL4, 0x0C}, /* I2S, 16-bit */
         {ES8388_ADCCONTROL5, 0x02}, /* MCLK/LRCK = 256 */
@@ -177,7 +177,7 @@ static esp_err_t es8388_init(void)
         /* 0x3C enables DAC + LOUT1/ROUT1 + LOUT2/ROUT2. */
         {ES8388_DACPOWER,    0x3C},
         {ES8388_DACCONTROL3, 0x00}, /* DAC unmute */
-        /* 0x09 = ADC on, LIN1/RIN1 enabled, MICBIAS off, low-power INT1LP. */
+        /* Power ADC L/R and keep the codec analog input path enabled. */
         {ES8388_ADCPOWER,    0x09},
     };
 
