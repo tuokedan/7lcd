@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "esp_event.h"
 #include "esp_heap_caps.h"
