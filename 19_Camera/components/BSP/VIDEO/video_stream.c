@@ -29,6 +29,11 @@ static const char *TAG = "video";
 #define VIDEO_BUFFER_COUNT  3
 #define VIDEO_FRAME_INTERVAL_US 200000 /* about 5 FPS */
 
+#define PC_VIDEO_MAX_JPEG_SIZE (128 * 1024)
+#define PC_VIDEO_RGB_SIZE (320 * 240 * 2)
+static uint8_t *s_pc_jpeg = NULL;
+static uint8_t *s_pc_rgb565 = NULL;
+
 typedef struct {
     uint8_t *data;
     size_t len;
@@ -98,6 +103,57 @@ static esp_err_t video_root_handler(httpd_req_t *req)
 
     httpd_resp_set_type(req, "text/html; charset=utf-8");
     return httpd_resp_send(req, html, HTTPD_RESP_USE_STRLEN);
+}
+
+static esp_err_t pc_video_handler(httpd_req_t *req)
+{
+    if (req->content_len == 0 || req->content_len > PC_VIDEO_MAX_JPEG_SIZE) {
+        ESP_LOGW(TAG, "PC JPEG size invalid: %u", (unsigned)req->content_len);
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JPEG too large or empty");
+        return ESP_FAIL;
+    }
+
+    if (s_pc_jpeg == NULL || s_pc_rgb565 == NULL) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Video buffers unavailable");
+        return ESP_FAIL;
+    }
+
+    size_t total = 0;
+    while (total < req->content_len) {
+        int received = httpd_req_recv(
+            req,
+            (char *)s_pc_jpeg + total,
+            req->content_len - total);
+
+        if (received <= 0) {
+            if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+                continue;
+            }
+            ESP_LOGW(TAG, "PC JPEG receive failed: %d", received);
+            return ESP_FAIL;
+        }
+
+        total += (size_t)received;
+    }
+
+    if (!jpg2rgb565(
+            s_pc_jpeg,
+            total,
+            s_pc_rgb565,
+            JPG_SCALE_NONE)) {
+        ESP_LOGW(TAG, "PC JPEG decode failed, size=%u", (unsigned)total);
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JPEG");
+        return ESP_FAIL;
+    }
+
+    /* PC 摄像头固定发送 320x240，因此直接整屏显示。 */
+    lcd_lock();
+    lcd_show_picture(s_pc_rgb565);
+    lcd_unlock();
+
+    httpd_resp_set_type(req, "text/plain");
+    httpd_resp_sendstr(req, "OK");
+    return ESP_OK;
 }
 
 static esp_err_t video_stream_handler(httpd_req_t *req)
@@ -193,6 +249,13 @@ static void start_http_server(void)
         .user_ctx = NULL,
     };
 
+    httpd_uri_t pc_video_uri = {
+        .uri = "/pcvideo",
+        .method = HTTP_POST,
+        .handler = pc_video_handler,
+        .user_ctx = NULL,
+    };
+
     httpd_uri_t video_uri = {
         .uri = "/video",
         .method = HTTP_GET,
@@ -202,6 +265,7 @@ static void start_http_server(void)
 
     ESP_ERROR_CHECK(httpd_register_uri_handler(server, &root_uri));
     ESP_ERROR_CHECK(httpd_register_uri_handler(server, &video_uri));
+    ESP_ERROR_CHECK(httpd_register_uri_handler(server, &pc_video_uri));
 
     ESP_LOGI(TAG, "HTTP video server started: http://192.168.4.1/video");
 }
@@ -229,7 +293,7 @@ static void start_wifi_ap(void)
             .ssid_len = sizeof(VIDEO_AP_SSID) - 1,
             .channel = 6,
             .password = VIDEO_AP_PASSWORD,
-            .max_connection = 1,
+            .max_connection = 2,
             .authmode = WIFI_AUTH_WPA2_PSK,
             .pmf_cfg = {
                 .required = false,
@@ -273,6 +337,17 @@ void video_stream_init(void)
             s_buffer_mutex = NULL;
             return;
         }
+    }
+
+    s_pc_jpeg = heap_caps_malloc(PC_VIDEO_MAX_JPEG_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    s_pc_rgb565 = heap_caps_malloc(PC_VIDEO_RGB_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    if (s_pc_jpeg == NULL || s_pc_rgb565 == NULL) {
+        ESP_LOGE(TAG, "PC reverse-video buffers allocation failed");
+        if (s_pc_jpeg) heap_caps_free(s_pc_jpeg);
+        if (s_pc_rgb565) heap_caps_free(s_pc_rgb565);
+        s_pc_jpeg = NULL;
+        s_pc_rgb565 = NULL;
+        return;
     }
 
     start_wifi_ap();
