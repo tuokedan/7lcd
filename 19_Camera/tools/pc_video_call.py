@@ -51,6 +51,7 @@ pc_send_fps = 0.0
 esp_recv_fps = 0.0
 audio_tx_fps = 0.0
 audio_rx_fps = 0.0
+audio_socket = None
 
 
 def iter_jpegs(url):
@@ -194,7 +195,6 @@ def send_thread():
 def audio_send_thread():
     global audio_tx_fps
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     esp_addr = (ESP32_HOST, AUDIO_ESP32_PORT)
     count = 0
     start_time = time.perf_counter()
@@ -216,7 +216,7 @@ def audio_send_thread():
                 stereo[0::2] = mono
                 stereo[1::2] = mono
 
-                sock.sendto(stereo.tobytes(), esp_addr)
+                audio_socket.sendto(stereo.tobytes(), esp_addr)
                 count += 1
 
                 now = time.perf_counter()
@@ -229,15 +229,13 @@ def audio_send_thread():
         if running:
             print(f"[PC MIC -> ESP32] audio error: {exc}")
     finally:
-        sock.close()
+        pass
 
 
 def audio_receive_thread():
     global audio_rx_fps
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(("0.0.0.0", AUDIO_PC_PORT))
-    sock.settimeout(0.2)
+    audio_socket.settimeout(0.2)
 
     count = 0
     start_time = time.perf_counter()
@@ -251,7 +249,7 @@ def audio_receive_thread():
         ) as stream:
             while running:
                 try:
-                    data, _addr = sock.recvfrom(AUDIO_BLOCK_SAMPLES * AUDIO_CHANNELS * 2 + 64)
+                    data, _addr = audio_socket.recvfrom(AUDIO_BLOCK_SAMPLES * AUDIO_CHANNELS * 2 + 64)
                 except socket.timeout:
                     continue
 
@@ -271,7 +269,7 @@ def audio_receive_thread():
         if running:
             print(f"[ESP32 MIC -> PC] audio error: {exc}")
     finally:
-        sock.close()
+        pass
 
 
 def add_label(image, text):
@@ -290,7 +288,7 @@ def add_label(image, text):
 
 
 def main():
-    global running
+    global running, audio_socket
 
     print("==========================================")
     print(" ESP32-S3 Bidirectional Video Test")
@@ -299,6 +297,9 @@ def main():
     print("==========================================")
     print(f"ESP32: {ESP32_HOST}")
     print("Press Q or ESC to exit.")
+
+    audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    audio_socket.bind(("0.0.0.0", AUDIO_PC_PORT))
 
     rx = threading.Thread(target=receive_thread, daemon=True)
     tx = threading.Thread(target=send_thread, daemon=True)
@@ -340,6 +341,8 @@ def main():
 
     finally:
         running = False
+        if audio_socket is not None:
+            audio_socket.close()
         cv2.destroyAllWindows()
 
     print("Video + audio call test stopped.")
