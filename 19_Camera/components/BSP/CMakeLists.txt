@@ -3,14 +3,16 @@ set(src_dirs
             LCD
             SPI
             YOLO
-            VIDEO)
+            VIDEO
+            AUDIO)
 
 set(include_dirs
             CAMERA
             LCD
             SPI
             YOLO
-            VIDEO)
+            VIDEO
+            AUDIO)
 
 set(requires
             driver
