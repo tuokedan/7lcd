@@ -73,6 +73,14 @@ static socklen_t s_peer_addr_len = 0;
 static volatile bool s_peer_valid = false;
 static portMUX_TYPE s_peer_lock = portMUX_INITIALIZER_UNLOCKED;
 
+static uint32_t s_rx_packets = 0;
+static uint32_t s_rx_nonzero = 0;
+static uint32_t s_tx_packets = 0;
+static int32_t s_rx_peak = 0;
+static int32_t s_tx_peak = 0;
+static uint32_t s_rx_sum_abs = 0;
+static uint32_t s_tx_sum_abs = 0;
+
 static esp_err_t es8388_write_reg(uint8_t reg, uint8_t value)
 {
     uint8_t data[2] = {reg, value};
@@ -279,6 +287,20 @@ static void audio_rx_task(void *arg)
 
         /* Only complete PCM frames are played. */
         if (len == AUDIO_FRAME_BYTES) {
+            const int16_t *samples = (const int16_t *)buffer;
+            int32_t peak = 0;
+            uint32_t sum_abs = 0;
+            for (size_t i = 0; i < AUDIO_FRAME_BYTES / sizeof(int16_t); ++i) {
+                int32_t v = samples[i];
+                int32_t a = v < 0 ? -v : v;
+                if (a > peak) peak = a;
+                sum_abs += (uint32_t)a;
+            }
+            s_rx_packets++;
+            if (peak > 32) s_rx_nonzero++;
+            s_rx_peak = peak;
+            s_rx_sum_abs = sum_abs / (AUDIO_FRAME_BYTES / sizeof(int16_t));
+
             size_t written = 0;
             i2s_write(
                 AUDIO_I2S_PORT,
@@ -287,6 +309,28 @@ static void audio_rx_task(void *arg)
                 &written,
                 pdMS_TO_TICKS(30));
         }
+    }
+}
+
+static void audio_diag_task(void *arg)
+{
+    uint32_t last_rx = 0;
+    uint32_t last_tx = 0;
+    while (true) {
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        uint32_t rx = s_rx_packets;
+        uint32_t tx = s_tx_packets;
+        ESP_LOGI(TAG,
+                 "Audio diag: PC->ESP packets=%lu (+%lu), peak=%ld, avgAbs=%lu, nonzero=%lu; "
+                 "ESP->PC packets=%lu (+%lu), peak=%ld, avgAbs=%lu, peer=%s",
+                 (unsigned long)rx, (unsigned long)(rx - last_rx),
+                 (long)s_rx_peak, (unsigned long)s_rx_sum_abs,
+                 (unsigned long)s_rx_nonzero,
+                 (unsigned long)tx, (unsigned long)(tx - last_tx),
+                 (long)s_tx_peak, (unsigned long)s_tx_sum_abs,
+                 s_peer_valid ? "YES" : "NO");
+        last_rx = rx;
+        last_tx = tx;
     }
 }
 
@@ -312,6 +356,19 @@ static void audio_tx_task(void *arg)
         if (!audio_get_peer(&peer, &peer_len)) {
             continue;
         }
+
+        const int16_t *samples = (const int16_t *)buffer;
+        int32_t peak = 0;
+        uint32_t sum_abs = 0;
+        for (size_t i = 0; i < sizeof(buffer) / sizeof(int16_t); ++i) {
+            int32_t v = samples[i];
+            int32_t a = v < 0 ? -v : v;
+            if (a > peak) peak = a;
+            sum_abs += (uint32_t)a;
+        }
+        s_tx_packets++;
+        s_tx_peak = peak;
+        s_tx_sum_abs = sum_abs / (sizeof(buffer) / sizeof(int16_t));
 
         int sent = sendto(
             s_audio_socket,
@@ -393,8 +450,10 @@ void audio_init(void)
         audio_rx_task, "audio_rx", 4096, NULL, 5, NULL, 0);
     BaseType_t ret2 = xTaskCreatePinnedToCore(
         audio_tx_task, "audio_tx", 4096, NULL, 5, NULL, 1);
+    BaseType_t ret3 = xTaskCreatePinnedToCore(
+        audio_diag_task, "audio_diag", 3072, NULL, 4, NULL, 0);
 
-    if (ret1 != pdPASS || ret2 != pdPASS) {
+    if (ret1 != pdPASS || ret2 != pdPASS || ret3 != pdPASS) {
         ESP_LOGE(TAG, "Audio task creation failed");
         return;
     }
