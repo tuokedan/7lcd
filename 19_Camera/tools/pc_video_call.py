@@ -21,13 +21,21 @@ import sys
 import time
 import threading
 import urllib.request
+import socket
 
 import cv2
 import numpy as np
+import sounddevice as sd
 
 ESP32_HOST = "192.168.4.1"
 PC_TO_ESP32_URL = f"http://{ESP32_HOST}:81/pcvideo"
 ESP32_TO_PC_URL = f"http://{ESP32_HOST}/video"
+AUDIO_ESP32_PORT = 5005
+AUDIO_PC_PORT = 5006
+AUDIO_SAMPLE_RATE = 16000
+AUDIO_CHANNELS = 2
+AUDIO_BLOCK_SAMPLES = 320  # 20 ms
+
 
 CAMERA_INDEX = 0
 WIDTH = 320
@@ -41,6 +49,8 @@ latest_esp_frame = None
 running = True
 pc_send_fps = 0.0
 esp_recv_fps = 0.0
+audio_tx_fps = 0.0
+audio_rx_fps = 0.0
 
 
 def iter_jpegs(url):
@@ -181,6 +191,89 @@ def send_thread():
         cap.release()
 
 
+def audio_send_thread():
+    global audio_tx_fps
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    esp_addr = (ESP32_HOST, AUDIO_ESP32_PORT)
+    count = 0
+    start_time = time.perf_counter()
+
+    try:
+        with sd.RawInputStream(
+            samplerate=AUDIO_SAMPLE_RATE,
+            blocksize=AUDIO_BLOCK_SAMPLES,
+            channels=1,
+            dtype="int16",
+        ) as stream:
+            while running:
+                pcm_mono, overflowed = stream.read(AUDIO_BLOCK_SAMPLES)
+                if not running:
+                    break
+
+                mono = np.frombuffer(pcm_mono, dtype=np.int16)
+                stereo = np.empty(mono.size * 2, dtype=np.int16)
+                stereo[0::2] = mono
+                stereo[1::2] = mono
+
+                sock.sendto(stereo.tobytes(), esp_addr)
+                count += 1
+
+                now = time.perf_counter()
+                elapsed = now - start_time
+                if elapsed >= 1.0:
+                    audio_tx_fps = count / elapsed
+                    count = 0
+                    start_time = now
+    except Exception as exc:
+        if running:
+            print(f"[PC MIC -> ESP32] audio error: {exc}")
+    finally:
+        sock.close()
+
+
+def audio_receive_thread():
+    global audio_rx_fps
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(("0.0.0.0", AUDIO_PC_PORT))
+    sock.settimeout(0.2)
+
+    count = 0
+    start_time = time.perf_counter()
+
+    try:
+        with sd.RawOutputStream(
+            samplerate=AUDIO_SAMPLE_RATE,
+            blocksize=AUDIO_BLOCK_SAMPLES,
+            channels=AUDIO_CHANNELS,
+            dtype="int16",
+        ) as stream:
+            while running:
+                try:
+                    data, _addr = sock.recvfrom(AUDIO_BLOCK_SAMPLES * AUDIO_CHANNELS * 2 + 64)
+                except socket.timeout:
+                    continue
+
+                if len(data) != AUDIO_BLOCK_SAMPLES * AUDIO_CHANNELS * 2:
+                    continue
+
+                stream.write(data)
+                count += 1
+
+                now = time.perf_counter()
+                elapsed = now - start_time
+                if elapsed >= 1.0:
+                    audio_rx_fps = count / elapsed
+                    count = 0
+                    start_time = now
+    except Exception as exc:
+        if running:
+            print(f"[ESP32 MIC -> PC] audio error: {exc}")
+    finally:
+        sock.close()
+
+
 def add_label(image, text):
     cv2.rectangle(image, (0, 0), (WIDTH, 30), (0, 0, 0), -1)
     cv2.putText(
@@ -209,8 +302,12 @@ def main():
 
     rx = threading.Thread(target=receive_thread, daemon=True)
     tx = threading.Thread(target=send_thread, daemon=True)
+    audio_tx = threading.Thread(target=audio_send_thread, daemon=True)
+    audio_rx = threading.Thread(target=audio_receive_thread, daemon=True)
     rx.start()
     tx.start()
+    audio_tx.start()
+    audio_rx.start()
 
     blank = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
 
@@ -221,6 +318,8 @@ def main():
                 esp = None if latest_esp_frame is None else latest_esp_frame.copy()
                 tx_fps = pc_send_fps
                 rx_fps = esp_recv_fps
+                atx_fps = audio_tx_fps
+                arx_fps = audio_rx_fps
 
             if pc is None:
                 pc = blank.copy()
@@ -229,6 +328,8 @@ def main():
 
             left = add_label(pc, f"PC Camera -> ESP32 LCD  {tx_fps:.1f} FPS")
             right = add_label(esp, f"ESP32 Camera -> PC  {rx_fps:.1f} FPS")
+            cv2.putText(left, f"Audio TX {atx_fps:.1f} fps", (8, HEIGHT - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1, cv2.LINE_AA)
+            cv2.putText(right, f"Audio RX {arx_fps:.1f} fps", (8, HEIGHT - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1, cv2.LINE_AA)
 
             combined = np.hstack((left, right))
             cv2.imshow("ESP32 Bidirectional Video", combined)
@@ -241,7 +342,7 @@ def main():
         running = False
         cv2.destroyAllWindows()
 
-    print("Video call test stopped.")
+    print("Video + audio call test stopped.")
 
 
 if __name__ == "__main__":
