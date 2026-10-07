@@ -1,4 +1,5 @@
 #include "video_stream.h"
+#include "lcd.h"
 
 #include <string.h>
 #include <stdio.h>
