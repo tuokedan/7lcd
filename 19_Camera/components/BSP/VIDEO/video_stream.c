@@ -231,15 +231,22 @@ static esp_err_t video_stream_handler(httpd_req_t *req)
 
 static void start_http_server(void)
 {
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.server_port = VIDEO_HTTP_PORT;
-    config.max_uri_handlers = 4;
-    config.stack_size = 8192;
+    /*
+     * /video is a long-lived MJPEG connection.  ESP-IDF HTTP server
+     * executes the URI handler in its server task, so keeping /video and
+     * /pcvideo on the same server can block the POST handler and cause
+     * PC -> ESP32 timeouts.  Use a second HTTP server on port 81 for
+     * reverse video.
+     */
+    httpd_config_t video_config = HTTPD_DEFAULT_CONFIG();
+    video_config.server_port = VIDEO_HTTP_PORT;
+    video_config.max_uri_handlers = 2;
+    video_config.stack_size = 8192;
 
-    httpd_handle_t server = NULL;
-    esp_err_t ret = httpd_start(&server, &config);
+    httpd_handle_t video_server = NULL;
+    esp_err_t ret = httpd_start(&video_server, &video_config);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "HTTP server start failed: 0x%x", ret);
+        ESP_LOGE(TAG, "Video HTTP server start failed: 0x%x", ret);
         return;
     }
 
@@ -250,13 +257,6 @@ static void start_http_server(void)
         .user_ctx = NULL,
     };
 
-    httpd_uri_t pc_video_uri = {
-        .uri = "/pcvideo",
-        .method = HTTP_POST,
-        .handler = pc_video_handler,
-        .user_ctx = NULL,
-    };
-
     httpd_uri_t video_uri = {
         .uri = "/video",
         .method = HTTP_GET,
@@ -264,52 +264,34 @@ static void start_http_server(void)
         .user_ctx = NULL,
     };
 
-    ESP_ERROR_CHECK(httpd_register_uri_handler(server, &root_uri));
-    ESP_ERROR_CHECK(httpd_register_uri_handler(server, &video_uri));
-    ESP_ERROR_CHECK(httpd_register_uri_handler(server, &pc_video_uri));
+    ESP_ERROR_CHECK(httpd_register_uri_handler(video_server, &root_uri));
+    ESP_ERROR_CHECK(httpd_register_uri_handler(video_server, &video_uri));
 
-    ESP_LOGI(TAG, "HTTP video server started: http://192.168.4.1/video");
-}
+    httpd_config_t pc_config = HTTPD_DEFAULT_CONFIG();
+    pc_config.server_port = VIDEO_HTTP_PORT + 1;
+    pc_config.max_uri_handlers = 1;
+    pc_config.stack_size = 8192;
 
-static void start_wifi_ap(void)
-{
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
-        ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
+    httpd_handle_t pc_server = NULL;
+    ret = httpd_start(&pc_server, &pc_config);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "PC video HTTP server start failed: 0x%x", ret);
+        return;
     }
-    ESP_ERROR_CHECK(ret);
 
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_netif_create_default_wifi_ap();
-
-    wifi_init_config_t wifi_cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&wifi_cfg));
-
-    wifi_config_t ap_config = {
-        .ap = {
-            .ssid = VIDEO_AP_SSID,
-            .ssid_len = sizeof(VIDEO_AP_SSID) - 1,
-            .channel = 6,
-            .password = VIDEO_AP_PASSWORD,
-            .max_connection = 2,
-            .authmode = WIFI_AUTH_WPA2_PSK,
-            .pmf_cfg = {
-                .required = false,
-            },
-        },
+    httpd_uri_t pc_video_uri = {
+        .uri = "/pcvideo",
+        .method = HTTP_POST,
+        .handler = pc_video_handler,
+        .user_ctx = NULL,
     };
 
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap_config));
-    ESP_ERROR_CHECK(esp_wifi_start());
+    ESP_ERROR_CHECK(httpd_register_uri_handler(pc_server, &pc_video_uri));
 
-    ESP_LOGI(TAG, "Wi-Fi AP started");
-    ESP_LOGI(TAG, "SSID: %s", VIDEO_AP_SSID);
-    ESP_LOGI(TAG, "Password: %s", VIDEO_AP_PASSWORD);
-    ESP_LOGI(TAG, "Connect PC to the AP, then open 192.168.4.1");
+    ESP_LOGI(TAG, "HTTP video server started: http://192.168.4.1:%d/video",
+             VIDEO_HTTP_PORT);
+    ESP_LOGI(TAG, "HTTP PC video server started: http://192.168.4.1:%d/pcvideo",
+             VIDEO_HTTP_PORT + 1);
 }
 
 void video_stream_init(void)
