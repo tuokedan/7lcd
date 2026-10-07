@@ -36,10 +36,9 @@ static camera_config_t camera_config = {
 
     .fb_location = CAMERA_FB_IN_PSRAM,
     .pixel_format = PIXFORMAT_RGB565,
-    .frame_size = FRAMESIZE_QVGA,       /* 320x240，与 LCD 完全匹配 */
+    .frame_size = FRAMESIZE_QVGA,
     .jpeg_quality = 12,
     .fb_count = 3,
-    /* LCD 刷屏和 AI 推理会占用较长时间，优先保留最新完整帧。 */
     .grab_mode = CAMERA_GRAB_LATEST,
 };
 
@@ -56,7 +55,6 @@ static inline void draw_pixel_rgb565(uint8_t *buf,
     }
 
     size_t offset = ((size_t)y * width + (size_t)x) * 2;
-
     buf[offset] = (uint8_t)(color >> 8);
     buf[offset + 1] = (uint8_t)(color & 0xFF);
 }
@@ -84,7 +82,6 @@ static void draw_detection_box(uint8_t *buf,
         return;
     }
 
-    /* 红色矩形框，2 像素宽，直接画在当前帧上。 */
     const uint16_t color = RED;
 
     for (int x = x1; x <= x2; ++x) {
@@ -104,7 +101,6 @@ static void draw_detection_box(uint8_t *buf,
 
 void camera_init(void)
 {
-    /* RESET 为有效低，PWDN 在硬件上未接 ESP32 GPIO。 */
     CAM_RST(0);
     vTaskDelay(pdMS_TO_TICKS(20));
     CAM_RST(1);
@@ -140,30 +136,22 @@ void camera_show(uint16_t x, uint16_t y)
         return;
     }
 
-    /*
-     * YOLO 已经独立到 CPU1 后台任务。
-     * 这里只复制一帧到 YOLO 的 PSRAM 双缓冲区；
-     * 如果 YOLO 正在忙且没有空闲缓冲区，立即跳过本帧，不阻塞 LCD。
-     */
     (void)yolo_person_submit_frame(fb->buf, fb->width, fb->height);
 
-    /*
-     * 读取最近一次检测结果。
-     * 检测可能来自前一帧，因此它代表“最近一次有效检测”，
-     * 而不是强制等待当前帧的 YOLO 推理。
-     */
     yolo_detection_t detection;
     if (yolo_person_get_latest_detection(&detection) &&
         detection.confidence >= 0.35f) {
         draw_detection_box(fb->buf, fb->width, fb->height, &detection);
     }
 
+    /*
+     * LCD 与 PC 回传显示共用 SPI2，必须串行化。
+     * 只锁住实际刷屏过程，JPEG 编码在锁外进行。
+     */
+    lcd_lock();
+
     lcd_set_window(x, y, x + fb->width - 1, y + fb->height - 1);
 
-    /*
-     * 摄像头已经直接输出 RGB565，因此无需再复制到 LCD 缓冲区。
-     * 直接分块发送 PSRAM 中的帧数据。
-     */
     const size_t chunk_size = 11520;
     size_t offset = 0;
 
@@ -176,6 +164,8 @@ void camera_show(uint16_t x, uint16_t y)
         lcd_write_datan(fb->buf + offset, (uint16_t)chunk);
         offset += chunk;
     }
+
+    lcd_unlock();
 
     video_stream_publish_frame(fb);
 
