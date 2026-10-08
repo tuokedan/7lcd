@@ -186,6 +186,7 @@ static esp_err_t es8388_init(void)
          */
         /* The original recorder leaves DACCONTROL21 at 0x80; no extra state-machine pulse. */
         {ES8388_ADCPOWER,    0x09},
+        {ES8388_ADCCONTROL4, 0x0C},
     };
 
     for (size_t i = 0; i < sizeof(init_regs) / sizeof(init_regs[0]); ++i) {
@@ -297,19 +298,22 @@ static esp_err_t audio_i2s_init(void)
              "MCLK=%d BCLK=%d LRCK=%d DOUT=%d DIN=%d",
              AUDIO_MCLK, AUDIO_BCLK, AUDIO_LRCK, AUDIO_DOUT, AUDIO_DIN);
 
-    /* Hardware-level check of the physical ES8388 ASDOUT -> GPIO20 line. */
-    int last_level = gpio_get_level(AUDIO_DIN);
-    int ones = last_level ? 1 : 0;
-    int zeros = last_level ? 0 : 1;
-    int transitions = 0;
-    for (int i = 0; i < 20000; ++i) {
-        int level = gpio_get_level(AUDIO_DIN);
-        if (level) ++ones; else ++zeros;
-        if (level != last_level) ++transitions;
-        last_level = level;
+    const gpio_num_t diag_pins[] = {AUDIO_MCLK, AUDIO_BCLK, AUDIO_LRCK, AUDIO_DIN};
+    const char *diag_names[] = {"GPIO0 MCLK", "GPIO14 BCLK", "GPIO19 LRCK", "GPIO20 ASDOUT"};
+    for (size_t p = 0; p < 4; ++p) {
+        int last = gpio_get_level(diag_pins[p]);
+        int ones = last ? 1 : 0;
+        int zeros = last ? 0 : 1;
+        int transitions = 0;
+        for (int i = 0; i < 20000; ++i) {
+            int level = gpio_get_level(diag_pins[p]);
+            if (level) ++ones; else ++zeros;
+            if (level != last) ++transitions;
+            last = level;
+        }
+        ESP_LOGI(TAG, "%s diagnostic: 0=%d 1=%d transitions=%d",
+                 diag_names[p], zeros, ones, transitions);
     }
-    ESP_LOGI(TAG, "GPIO20 ASDOUT pad diagnostic: 0=%d 1=%d transitions=%d",
-             zeros, ones, transitions);
     return ESP_OK;
 }
 
