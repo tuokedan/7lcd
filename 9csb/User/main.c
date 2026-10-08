@@ -101,9 +101,9 @@ int main(void)
 	robot_set_signed_speed(0,0);
 
 	Serial_Printf("
-ESP32 person-follow controller ready\r
+ESP32 person-follow controller ready
 ");
-	Serial_Printf("USART1 PA9/PA10 115200 8N1\r
+	Serial_Printf("USART1 PA9/PA10 115200 8N1
 ");
 
 	while(1)
