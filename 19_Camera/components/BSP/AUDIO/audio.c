@@ -223,18 +223,20 @@ static esp_err_t es8388_init(void)
 static esp_err_t audio_i2s_init(void)
 {
     /*
-     * Split TX/RX across the two S3 I2S controllers.
+     * Use the same legacy full-duplex I2S0 arrangement as the board's
+     * proven 1_15_recorder example.
      *
-     * I2S0 is the master and generates MCLK/BCLK/LRCK for ES8388 and
-     * handles speaker playback. I2S1 is a slave RX-only receiver that
-     * listens to the same BCLK/LRCK and captures ES8388 ASDOUT on GPIO20.
+     * ES8388 is clocked by ESP32-S3:
+     *   MCLK=GPIO0, BCLK=GPIO14, LRCK=GPIO19
+     *   DOUT=GPIO21 (speaker), DIN=GPIO20 (microphone)
      *
-     * This deliberately avoids legacy full-duplex I2S0 RX/TX sharing one
-     * DMA/clock state, which is the remaining suspect after the codec and
-     * UDP paths were verified.
+     * The previous I2S0-master/I2S1-slave experiment produced zero DMA
+     * bytes, proving that the slave receiver was not seeing a usable clock.
+     * Go back to the known-good recorder topology before changing any
+     * codec settings again.
      */
-    i2s_config_t tx_cfg = {
-        .mode = I2S_MODE_MASTER | I2S_MODE_TX,
+    i2s_config_t cfg = {
+        .mode = I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX,
         .sample_rate = AUDIO_SAMPLE_RATE,
         .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
@@ -247,73 +249,37 @@ static esp_err_t audio_i2s_init(void)
         .fixed_mclk = 0,
     };
 
-    i2s_pin_config_t tx_pins = {
+    i2s_pin_config_t pins = {
         .mck_io_num = AUDIO_MCLK,
         .bck_io_num = AUDIO_BCLK,
         .ws_io_num = AUDIO_LRCK,
         .data_out_num = AUDIO_DOUT,
-        .data_in_num = I2S_PIN_NO_CHANGE,
-    };
-
-    esp_err_t ret = i2s_driver_install(AUDIO_I2S_TX_PORT, &tx_cfg, 0, NULL);
-    if (ret != ESP_OK) return ret;
-
-    ret = i2s_set_pin(AUDIO_I2S_TX_PORT, &tx_pins);
-    if (ret != ESP_OK) {
-        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
-        return ret;
-    }
-
-    i2s_config_t rx_cfg = {
-        .mode = I2S_MODE_SLAVE | I2S_MODE_RX,
-        .sample_rate = AUDIO_SAMPLE_RATE,
-        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-        .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
-        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
-        .dma_buf_count = 6,
-        .dma_buf_len = 256,
-        .use_apll = false,
-        .tx_desc_auto_clear = false,
-        .fixed_mclk = 0,
-    };
-
-    i2s_pin_config_t rx_pins = {
-        .mck_io_num = I2S_PIN_NO_CHANGE,
-        .bck_io_num = AUDIO_BCLK,
-        .ws_io_num = AUDIO_LRCK,
-        .data_out_num = I2S_PIN_NO_CHANGE,
         .data_in_num = AUDIO_DIN,
     };
 
-    ret = i2s_driver_install(AUDIO_I2S_RX_PORT, &rx_cfg, 0, NULL);
-    if (ret != ESP_OK) {
-        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
-        return ret;
-    }
+    esp_err_t ret = i2s_driver_install(AUDIO_I2S_TX_PORT, &cfg, 0, NULL);
+    if (ret != ESP_OK) return ret;
 
-    ret = i2s_set_pin(AUDIO_I2S_RX_PORT, &rx_pins);
+    ret = i2s_set_pin(AUDIO_I2S_TX_PORT, &pins);
     if (ret != ESP_OK) {
-        i2s_driver_uninstall(AUDIO_I2S_RX_PORT);
         i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
         return ret;
     }
 
     ret = i2s_zero_dma_buffer(AUDIO_I2S_TX_PORT);
-    if (ret != ESP_OK) return ret;
-
-    ret = i2s_zero_dma_buffer(AUDIO_I2S_RX_PORT);
-    if (ret != ESP_OK) return ret;
-
-    /* Arm RX before the master begins clocking. */
-    ret = i2s_start(AUDIO_I2S_RX_PORT);
-    if (ret != ESP_OK) return ret;
+    if (ret != ESP_OK) {
+        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
+        return ret;
+    }
 
     ret = i2s_start(AUDIO_I2S_TX_PORT);
-    if (ret != ESP_OK) return ret;
+    if (ret != ESP_OK) {
+        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
+        return ret;
+    }
 
     ESP_LOGI(TAG,
-             "I2S split mode: TX=I2S0 master, RX=I2S1 slave; "
+             "I2S recorder-compatible full-duplex: I2S0 master TX+RX; "
              "MCLK=%d BCLK=%d LRCK=%d DOUT=%d DIN=%d",
              AUDIO_MCLK, AUDIO_BCLK, AUDIO_LRCK, AUDIO_DOUT, AUDIO_DIN);
     return ESP_OK;
@@ -455,14 +421,28 @@ static void audio_tx_task(void *arg)
         s_tx_right_avg = (uint32_t)(right_sum / (sample_count / 2));
 
         if (s_tx_raw_frames < 8) {
+            const uint32_t *raw32 = (const uint32_t *)buffer;
             ESP_LOGI(TAG,
                      "I2S RX raw #%lu: Lpeak=%lu Lavg=%lu Rpeak=%lu Ravg=%lu; "
-                     "samples=%d,%d,%d,%d,%d,%d,%d,%d",
+                     "s16=%d,%d,%d,%d,%d,%d,%d,%d",
                      (unsigned long)s_tx_raw_frames,
                      (unsigned long)s_tx_left_peak, (unsigned long)s_tx_left_avg,
                      (unsigned long)s_tx_right_peak, (unsigned long)s_tx_right_avg,
                      samples[0], samples[1], samples[2], samples[3],
                      samples[4], samples[5], samples[6], samples[7]);
+            ESP_LOGI(TAG,
+                     "I2S RX raw32: %08lX %08lX %08lX %08lX %08lX %08lX %08lX %08lX",
+                     (unsigned long)raw32[0], (unsigned long)raw32[1],
+                     (unsigned long)raw32[2], (unsigned long)raw32[3],
+                     (unsigned long)raw32[4], (unsigned long)raw32[5],
+                     (unsigned long)raw32[6], (unsigned long)raw32[7]);
+            ESP_LOGI(TAG,
+                     "I2S RX bytes: %02X %02X %02X %02X %02X %02X %02X %02X "
+                     "%02X %02X %02X %02X %02X %02X %02X %02X",
+                     buffer[0], buffer[1], buffer[2], buffer[3],
+                     buffer[4], buffer[5], buffer[6], buffer[7],
+                     buffer[8], buffer[9], buffer[10], buffer[11],
+                     buffer[12], buffer[13], buffer[14], buffer[15]);
             s_tx_raw_frames++;
         }
 
