@@ -54,6 +54,8 @@ static uint32_t s_frame_seq = 0;
 static SemaphoreHandle_t s_buffer_mutex = NULL;
 static bool s_started = false;
 static int64_t s_last_encode_us = 0;
+static volatile int64_t s_last_pc_video_us = 0;
+#define PC_VIDEO_ACTIVE_TIMEOUT_US 1500000
 
 static size_t jpeg_write_cb(void *arg, size_t index, const void *data, size_t len)
 {
@@ -146,6 +148,9 @@ static esp_err_t pc_video_handler(httpd_req_t *req)
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JPEG");
         return ESP_FAIL;
     }
+
+    /* 收到 PC 画面即认为反向视频处于活动状态；camera_show() 会暂停本机摄像头刷屏。 */
+    s_last_pc_video_us = esp_timer_get_time();
 
     /* PC 摄像头固定发送 320x240，因此直接整屏显示。 */
     lcd_lock();
@@ -479,4 +484,15 @@ void video_stream_publish_frame(const camera_fb_t *fb)
     s_last_encode_us = now_us;
 
     xSemaphoreGive(s_buffer_mutex);
+}
+
+
+bool video_stream_pc_video_active(void)
+{
+    int64_t last_us = s_last_pc_video_us;
+    if (last_us == 0) {
+        return false;
+    }
+
+    return (esp_timer_get_time() - last_us) < PC_VIDEO_ACTIVE_TIMEOUT_US;
 }
