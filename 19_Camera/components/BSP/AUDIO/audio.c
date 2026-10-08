@@ -305,6 +305,13 @@ static esp_err_t audio_i2s_init(void)
     ret = i2s_zero_dma_buffer(AUDIO_I2S_RX_PORT);
     if (ret != ESP_OK) return ret;
 
+    /* Arm RX before the master begins clocking. */
+    ret = i2s_start(AUDIO_I2S_RX_PORT);
+    if (ret != ESP_OK) return ret;
+
+    ret = i2s_start(AUDIO_I2S_TX_PORT);
+    if (ret != ESP_OK) return ret;
+
     ESP_LOGI(TAG,
              "I2S split mode: TX=I2S0 master, RX=I2S1 slave; "
              "MCLK=%d BCLK=%d LRCK=%d DOUT=%d DIN=%d",
@@ -404,8 +411,14 @@ static void audio_tx_task(void *arg)
     while (true) {
         size_t read_bytes = 0;
         esp_err_t ret = i2s_read(AUDIO_I2S_RX_PORT, buffer, sizeof(buffer),
-                                 &read_bytes, portMAX_DELAY);
-        if (ret != ESP_OK || read_bytes != sizeof(buffer)) continue;
+                                 &read_bytes, pdMS_TO_TICKS(500));
+        if (ret != ESP_OK || read_bytes != sizeof(buffer)) {
+            if (s_tx_raw_frames < 8) {
+                ESP_LOGW(TAG, "I2S RX read: err=%s bytes=%u",
+                         esp_err_to_name(ret), (unsigned)read_bytes);
+            }
+            continue;
+        }
 
         struct sockaddr_storage peer;
         socklen_t peer_len;
