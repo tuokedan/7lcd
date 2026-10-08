@@ -31,8 +31,10 @@ static const char *TAG = "video";
 #define VIDEO_FRAME_INTERVAL_US 200000 /* about 5 FPS */
 
 #define PC_VIDEO_MAX_JPEG_SIZE (128 * 1024)
-#define PC_VIDEO_RGB_SIZE (320 * 240 * 2)
+#define PC_VIDEO_RGB_SIZE  (320 * 240 * 2)
+#define PC_VIDEO_RGB888_SIZE (320 * 240 * 3)
 static uint8_t *s_pc_jpeg = NULL;
+static uint8_t *s_pc_rgb888 = NULL;
 static uint8_t *s_pc_rgb565 = NULL;
 
 typedef struct {
@@ -139,28 +141,43 @@ static esp_err_t pc_video_handler(httpd_req_t *req)
         total += (size_t)received;
     }
 
-    if (!jpg2rgb565(
+    /*
+     * 不再直接使用 jpg2rgb565()：
+     *
+     * 不同版本的 esp32-camera / JPEG decoder 对 RGB565 输出字节序
+     * 存在差异。直接交换 RGB565 两个字节虽然能消除部分花屏，
+     * 但容易留下颜色失真。
+     *
+     * 这里先解码为标准 RGB888，再由我们明确打包成 RGB565 BE。
+     * RGB888 的三个通道分别占一个字节，因此不会再产生字节序歧义。
+     */
+    if (!fmt2rgb888(
             s_pc_jpeg,
             total,
-            s_pc_rgb565,
-            JPG_SCALE_NONE)) {
-        ESP_LOGW(TAG, "PC JPEG decode failed, size=%u", (unsigned)total);
+            PIXFORMAT_JPEG,
+            s_pc_rgb888)) {
+        ESP_LOGW(TAG, "PC JPEG -> RGB888 decode failed, size=%u",
+                 (unsigned)total);
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JPEG");
         return ESP_FAIL;
     }
 
-    /*
-     * lcd_show_picture() 直接把 RGB565 原始字节发送给 ST7789，
-     * 而本工程摄像头/LCD链路使用的是高字节在前（RGB565 BE）。
-     *
-     * jpg2rgb565() 的解码输出在当前 esp32-camera / ESP-JPEG 链路
-     * 中可能是低字节在前，因此这里统一交换每个像素的两个字节。
-     * 不改摄像头原始帧，避免影响已经正常的 OV2640 -> LCD 路径。
-     */
-    for (size_t i = 0; i + 1 < PC_VIDEO_RGB_SIZE; i += 2) {
-        uint8_t tmp = s_pc_rgb565[i];
-        s_pc_rgb565[i] = s_pc_rgb565[i + 1];
-        s_pc_rgb565[i + 1] = tmp;
+    for (size_t pixel = 0; pixel < 320 * 240; ++pixel) {
+        const uint8_t r = s_pc_rgb888[pixel * 3 + 0];
+        const uint8_t g = s_pc_rgb888[pixel * 3 + 1];
+        const uint8_t b = s_pc_rgb888[pixel * 3 + 2];
+
+        /*
+         * RGB888 -> RGB565
+         * ST7789 使用 16-bit RGB565，数据高字节在前。
+         */
+        const uint16_t rgb565 =
+            (static_cast<uint16_t>(r & 0xF8) << 8) |
+            (static_cast<uint16_t>(g & 0xFC) << 3) |
+            (static_cast<uint16_t>(b) >> 3);
+
+        s_pc_rgb565[pixel * 2 + 0] = static_cast<uint8_t>(rgb565 >> 8);
+        s_pc_rgb565[pixel * 2 + 1] = static_cast<uint8_t>(rgb565 & 0xFF);
     }
 
     /* 收到 PC 画面即认为反向视频处于活动状态；camera_show() 会暂停本机摄像头刷屏。 */
@@ -419,13 +436,28 @@ void video_stream_init(void)
         }
     }
 
-    s_pc_jpeg = heap_caps_malloc(PC_VIDEO_MAX_JPEG_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    s_pc_rgb565 = heap_caps_malloc(PC_VIDEO_RGB_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    if (s_pc_jpeg == NULL || s_pc_rgb565 == NULL) {
+    s_pc_jpeg = heap_caps_malloc(
+        PC_VIDEO_MAX_JPEG_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    s_pc_rgb888 = heap_caps_malloc(
+        PC_VIDEO_RGB888_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    s_pc_rgb565 = heap_caps_malloc(
+        PC_VIDEO_RGB_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+
+    if (s_pc_jpeg == NULL || s_pc_rgb888 == NULL || s_pc_rgb565 == NULL) {
         ESP_LOGE(TAG, "PC reverse-video buffers allocation failed");
-        if (s_pc_jpeg) heap_caps_free(s_pc_jpeg);
-        if (s_pc_rgb565) heap_caps_free(s_pc_rgb565);
+
+        if (s_pc_jpeg) {
+            heap_caps_free(s_pc_jpeg);
+        }
+        if (s_pc_rgb888) {
+            heap_caps_free(s_pc_rgb888);
+        }
+        if (s_pc_rgb565) {
+            heap_caps_free(s_pc_rgb565);
+        }
+
         s_pc_jpeg = NULL;
+        s_pc_rgb888 = NULL;
         s_pc_rgb565 = NULL;
         return;
     }
