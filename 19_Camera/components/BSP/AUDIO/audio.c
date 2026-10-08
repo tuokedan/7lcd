@@ -150,9 +150,9 @@ static esp_err_t es8388_init(void)
         {ES8388_ADCPOWER,    0xFF},
         {ES8388_ADCCONTROL1, 0xBB},
         /* Schematic: MIC1 is connected to ES8388 LIN1. */
-        {ES8388_ADCCONTROL2, 0x05},
+        {ES8388_ADCCONTROL2, 0x00},
         {ES8388_ADCCONTROL3, 0x02},
-        {ES8388_ADCCONTROL4, 0x0C},
+        {ES8388_ADCCONTROL4, 0x0D},
         {ES8388_ADCCONTROL5, 0x02},
         {ES8388_ADCCONTROL8, 0x00},
         {ES8388_ADCCONTROL9, 0x00},
@@ -164,7 +164,7 @@ static esp_err_t es8388_init(void)
 
         {ES8388_DACPOWER,    0x3C},
         {ES8388_DACCONTROL3, 0x00},
-        {ES8388_ADCPOWER,    0x09},
+        {ES8388_ADCPOWER,    0x00},
     };
 
     for (size_t i = 0; i < sizeof(init_regs) / sizeof(init_regs[0]); ++i) {
@@ -193,6 +193,10 @@ static esp_err_t es8388_init(void)
     es8388_log_reg(ES8388_ADCCONTROL12, "ADCCONTROL12");
     es8388_log_reg(ES8388_ADCCONTROL13, "ADCCONTROL13");
     es8388_log_reg(ES8388_ADCCONTROL14, "ADCCONTROL14");
+
+    /* ADC must be fully powered for microphone capture. */
+    es8388_write_reg(ES8388_ADCPOWER, 0x00);
+    es8388_log_reg(ES8388_ADCPOWER, "ADCPOWER(final)");
 
     ESP_LOGI(TAG, "ES8388 initialized: 16 kHz / 16-bit / stereo / I2S slave");
     return ESP_OK;
