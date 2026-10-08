@@ -172,11 +172,24 @@ static esp_err_t es8388_init(void)
 
         {ES8388_DACPOWER,    0x3C},
         {ES8388_DACCONTROL3, 0x00},
+
+        /*
+         * IMPORTANT: reproduce the board's proven 1_15_recorder
+         * es8388_start(ES_MODULE_ADC_DAC) state-machine kick.
+         *
+         * The recorder writes DACCONTROL21=0x80 and, when that value
+         * changes, pulses CHIPPOWER 0xF0 -> 0x00 before powering the
+         * ADC/DAC. Our previous code wrote CHIPPOWER=0x00 only once,
+         * before DACCONTROL21 was changed, so the ES8388 internal
+         * state machine was never explicitly restarted at this point.
+         */
+        {ES8388_DACCONTROL21, 0x80},
+        {ES8388_CHIPPOWER,    0xF0},
+        {ES8388_CHIPPOWER,    0x00},
+
         /*
          * es8388_ctrl_state(BOTH, START) in the proven recorder finally
          * powers the ADC/line-input path with ADCPOWER=0x00.
-         * 0x09 leaves MICBIAS powered down and was the key mismatch in
-         * the previous diagnostic implementation.
          */
         {ES8388_ADCPOWER,    0x00},
     };
