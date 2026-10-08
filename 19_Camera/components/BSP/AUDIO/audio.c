@@ -152,7 +152,7 @@ static esp_err_t es8388_init(void)
         /* Schematic: MIC1 is connected to ES8388 LIN1. */
         {ES8388_ADCCONTROL2, 0x00},
         {ES8388_ADCCONTROL3, 0x02},
-        {ES8388_ADCCONTROL4, 0x0D},
+        {ES8388_ADCCONTROL4, 0x0C},
         {ES8388_ADCCONTROL5, 0x02},
         {ES8388_ADCCONTROL8, 0x00},
         {ES8388_ADCCONTROL9, 0x00},
@@ -164,7 +164,7 @@ static esp_err_t es8388_init(void)
 
         {ES8388_DACPOWER,    0x3C},
         {ES8388_DACCONTROL3, 0x00},
-        {ES8388_ADCPOWER,    0x00},
+        {ES8388_ADCPOWER,    0x09},
     };
 
     for (size_t i = 0; i < sizeof(init_regs) / sizeof(init_regs[0]); ++i) {
