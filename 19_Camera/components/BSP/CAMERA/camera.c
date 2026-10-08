@@ -187,78 +187,149 @@ static void robot_send_speed(int8_t left, int8_t right)
     (void)uart_write_bytes(ROBOT_UART, packet, sizeof(packet));
 }
 
-static int clamp_speed(int value)
-{
-    if (value > 100) return 100;
-    if (value < -100) return -100;
-    return value;
-}
-
 /*
- * 根据人物框中心控制转向，根据人物框高度粗略估计距离。
+ * 第一阶段仅测试 ESP32 -> STM32 串口和左右转向。
  *
- * 320x240 图像：
- *   cx < 135       -> 向左
- *   135~185        -> 基本直行
- *   cx > 185       -> 向右
+ * 不使用 YOLO 结果，不做距离/速度控制。
+ * 上电后依次：
+ *   STOP 1.5s
+ *   LEFT 1.0s
+ *   STOP 1.5s
+ *   RIGHT 1.0s
+ *   STOP 1.5s
  *
- * 人物框越高，说明人越近，车速越低；
- * 高度 >= 170 像素时停车，防止跟得过近。
+ * LEFT  = 左轮 -40，右轮 +40
+ * RIGHT = 左轮 +40，右轮 -40
+ *
+ * 每 100ms 重发一次，确保 STM32 的 700ms 通信超时保护不会触发。
+ * 测试完成后保持 STOP，不再自动动作。
  */
-static void robot_follow_person(const yolo_detection_t *detection)
+static void robot_uart_test(void)
 {
-    if (detection == NULL ||
-        detection->confidence < 0.35f) {
-        robot_send_speed(0, 0);
-        return;
+    enum {
+        TEST_STOP_BEFORE = 0,
+        TEST_LEFT,
+        TEST_STOP_MIDDLE,
+        TEST_RIGHT,
+        TEST_STOP_AFTER,
+        TEST_DONE
+    };
+
+    static int state = TEST_STOP_BEFORE;
+    static int64_t state_start_us = 0;
+    static int64_t last_send_us = 0;
+    static bool initialized = false;
+
+    static const char *state_name[] = {
+        "STOP",
+        "LEFT",
+        "STOP",
+        "RIGHT",
+        "STOP",
+        "DONE"
+    };
+
+    const int64_t now_us = esp_timer_get_time();
+
+    if (!initialized) {
+        initialized = true;
+        state_start_us = now_us;
+        last_send_us = 0;
+        ESP_LOGI(TAG, "=== ROBOT UART TEST START ===");
+        ESP_LOGI(TAG, "STOP 1.5s -> LEFT 1.0s -> STOP 1.5s -> RIGHT 1.0s -> STOP");
     }
 
-    const float cx = (detection->x1 + detection->x2) * 0.5f;
-    const float box_height = detection->y2 - detection->y1;
+    int64_t elapsed_us = now_us - state_start_us;
 
-    if (box_height >= 170.0f) {
-        robot_send_speed(0, 0);
-        return;
+    switch (state) {
+        case TEST_STOP_BEFORE:
+            if (elapsed_us >= 1500000) {
+                state = TEST_LEFT;
+                state_start_us = now_us;
+                elapsed_us = 0;
+                ESP_LOGI(TAG, "UART TEST: LEFT (-40, +40)");
+            }
+            break;
+
+        case TEST_LEFT:
+            if (elapsed_us >= 1000000) {
+                state = TEST_STOP_MIDDLE;
+                state_start_us = now_us;
+                elapsed_us = 0;
+                ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
+            }
+            break;
+
+        case TEST_STOP_MIDDLE:
+            if (elapsed_us >= 1500000) {
+                state = TEST_RIGHT;
+                state_start_us = now_us;
+                elapsed_us = 0;
+                ESP_LOGI(TAG, "UART TEST: RIGHT (+40, -40)");
+            }
+            break;
+
+        case TEST_RIGHT:
+            if (elapsed_us >= 1000000) {
+                state = TEST_STOP_AFTER;
+                state_start_us = now_us;
+                elapsed_us = 0;
+                ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
+            }
+            break;
+
+        case TEST_STOP_AFTER:
+            if (elapsed_us >= 1500000) {
+                state = TEST_DONE;
+                state_start_us = now_us;
+                ESP_LOGI(TAG, "=== ROBOT UART TEST DONE ===");
+            }
+            break;
+
+        case TEST_DONE:
+        default:
+            break;
     }
 
-    int base_speed;
-
-    if (box_height < 55.0f) {
-        base_speed = 70;
-    } else if (box_height < 85.0f) {
-        base_speed = 55;
-    } else if (box_height < 115.0f) {
-        base_speed = 40;
-    } else {
-        base_speed = 22;
-    }
-
-    float error = cx - 160.0f;
-
-    if (error > -20.0f && error < 20.0f) {
-        error = 0.0f;
-    }
-
-    /* 比例转向，右侧目标 -> 左轮加速、右轮减速。 */
-    int turn = (int)(error * 0.35f);
-
-    if (turn > 45) turn = 45;
-    if (turn < -45) turn = -45;
-
-    /*
-     * 人偏得很厉害时降低前进速度，让车辆优先把车头转向人。
-     */
-    if (error > 100.0f || error < -100.0f) {
-        if (base_speed > 25) {
-            base_speed = 25;
+    if (state == TEST_DONE) {
+        if (now_us - last_send_us >= 100000) {
+            robot_send_speed(0, 0);
+            last_send_us = now_us;
         }
+        return;
     }
 
-    int left = clamp_speed(base_speed + turn);
-    int right = clamp_speed(base_speed - turn);
+    if (now_us - last_send_us < 100000) {
+        return;
+    }
 
-    robot_send_speed((int8_t)left, (int8_t)right);
+    int8_t left = 0;
+    int8_t right = 0;
+
+    switch (state) {
+        case TEST_LEFT:
+            left = -40;
+            right = 40;
+            break;
+
+        case TEST_RIGHT:
+            left = 40;
+            right = -40;
+            break;
+
+        case TEST_STOP_BEFORE:
+        case TEST_STOP_MIDDLE:
+        case TEST_STOP_AFTER:
+        default:
+            left = 0;
+            right = 0;
+            break;
+    }
+
+    robot_send_speed(left, right);
+    last_send_us = now_us;
 }
+
 
 void camera_init(void)
 {
@@ -301,20 +372,11 @@ void camera_show(uint16_t x, uint16_t y)
         return;
     }
 
-    (void)yolo_person_submit_frame(fb->buf, fb->width, fb->height);
-
-    yolo_detection_t detection;
-    bool have_detection =
-        yolo_person_get_latest_detection(&detection) &&
-        detection.confidence >= 0.35f;
-
-    if (have_detection) {
-        draw_detection_box(fb->buf, fb->width, fb->height, &detection);
-        robot_follow_person(&detection);
-    } else {
-        /* 没检测到人，立即停车。 */
-        robot_send_speed(0, 0);
-    }
+    /*
+     * 第一阶段串口测试：暂时完全脱离 YOLO，
+     * 只验证 ESP32 -> STM32 的左右转指令。
+     */
+    robot_uart_test();
 
     if (!video_stream_pc_video_active()) {
         lcd_lock();
