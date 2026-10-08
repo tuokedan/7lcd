@@ -19,7 +19,7 @@ static const char *TAG = "audio";
 #define AUDIO_ES8388_ADDR    0x10
 
 #define AUDIO_I2S_TX_PORT    I2S_NUM_0
-#define AUDIO_I2S_RX_PORT    I2S_NUM_1
+#define AUDIO_I2S_RX_PORT    I2S_NUM_0
 #define AUDIO_MCLK           GPIO_NUM_0
 #define AUDIO_BCLK           GPIO_NUM_14
 #define AUDIO_LRCK           GPIO_NUM_19
@@ -223,8 +223,10 @@ static esp_err_t es8388_init(void)
 static esp_err_t audio_i2s_init(void)
 {
     /*
-     * Use the same legacy full-duplex I2S0 arrangement as the board's
-     * proven 1_15_recorder example.
+     * Use the same legacy full-duplex I2S0 arrangement as the board's proven
+     * 1_15_recorder example. TX and RX must use the same I2S0 handle in
+     * legacy full-duplex mode; using I2S_NUM_1 here leaves the RX handle
+     * uninstalled and causes i2s_read() to dereference a null handle.
      *
      * ES8388 is clocked by ESP32-S3:
      *   MCLK=GPIO0, BCLK=GPIO14, LRCK=GPIO19
