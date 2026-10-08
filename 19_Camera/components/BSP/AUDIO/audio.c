@@ -77,6 +77,11 @@ static int32_t s_rx_peak = 0;
 static int32_t s_tx_peak = 0;
 static uint32_t s_rx_sum_abs = 0;
 static uint32_t s_tx_sum_abs = 0;
+static uint32_t s_tx_left_peak = 0;
+static uint32_t s_tx_right_peak = 0;
+static uint32_t s_tx_left_avg = 0;
+static uint32_t s_tx_right_avg = 0;
+static uint32_t s_tx_raw_frames = 0;
 
 static esp_err_t es8388_write_reg(uint8_t reg, uint8_t value)
 {
@@ -152,7 +157,7 @@ static esp_err_t es8388_init(void)
         /* Schematic: MIC1 is connected to ES8388 LIN1. */
         {ES8388_ADCCONTROL2, 0x00},
         {ES8388_ADCCONTROL3, 0x02},
-        {ES8388_ADCCONTROL4, 0x0C},
+        {ES8388_ADCCONTROL4, 0x0D},
         {ES8388_ADCCONTROL5, 0x02},
         {ES8388_ADCCONTROL8, 0x00},
         {ES8388_ADCCONTROL9, 0x00},
@@ -212,8 +217,8 @@ static esp_err_t audio_i2s_init(void)
         .communication_format = I2S_COMM_FORMAT_STAND_I2S,
         .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
         .dma_buf_count = 6,
-        .dma_buf_len = AUDIO_FRAME_SAMPLES,
-        .use_apll = false,
+        .dma_buf_len = 256,
+        .use_apll = true,
         .tx_desc_auto_clear = true,
         .fixed_mclk = 0,
     };
@@ -313,12 +318,15 @@ static void audio_diag_task(void *arg)
         uint32_t rx = s_rx_packets, tx = s_tx_packets;
         ESP_LOGI(TAG,
                  "Audio diag: PC->ESP packets=%lu (+%lu), peak=%ld, avgAbs=%lu, nonzero=%lu; "
-                 "ESP->PC packets=%lu (+%lu), peak=%ld, avgAbs=%lu, peer=%s",
+                 "ESP->PC packets=%lu (+%lu), peak=%ld, avgAbs=%lu, "
+                 "Lpeak=%lu Rpeak=%lu, Lavg=%lu Ravg=%lu, peer=%s",
                  (unsigned long)rx, (unsigned long)(rx - last_rx),
                  (long)s_rx_peak, (unsigned long)s_rx_sum_abs,
                  (unsigned long)s_rx_nonzero,
                  (unsigned long)tx, (unsigned long)(tx - last_tx),
                  (long)s_tx_peak, (unsigned long)s_tx_sum_abs,
+                 (unsigned long)s_tx_left_peak, (unsigned long)s_tx_right_peak,
+                 (unsigned long)s_tx_left_avg, (unsigned long)s_tx_right_avg,
                  s_peer_valid ? "YES" : "NO");
         last_rx = rx;
         last_tx = tx;
@@ -342,15 +350,44 @@ static void audio_tx_task(void *arg)
         const int16_t *samples = (const int16_t *)buffer;
         int32_t peak = 0;
         uint32_t sum_abs = 0;
-        for (size_t i = 0; i < sizeof(buffer) / sizeof(int16_t); ++i) {
+        uint32_t left_peak = 0;
+        uint32_t right_peak = 0;
+        uint64_t left_sum = 0;
+        uint64_t right_sum = 0;
+        const size_t sample_count = sizeof(buffer) / sizeof(int16_t);
+        for (size_t i = 0; i < sample_count; ++i) {
             int32_t v = samples[i];
             int32_t a = v < 0 ? -v : v;
             if (a > peak) peak = a;
             sum_abs += (uint32_t)a;
+
+            if ((i & 1U) == 0) {
+                if ((uint32_t)a > left_peak) left_peak = (uint32_t)a;
+                left_sum += (uint32_t)a;
+            } else {
+                if ((uint32_t)a > right_peak) right_peak = (uint32_t)a;
+                right_sum += (uint32_t)a;
+            }
         }
         s_tx_packets++;
         s_tx_peak = peak;
-        s_tx_sum_abs = sum_abs / (sizeof(buffer) / sizeof(int16_t));
+        s_tx_sum_abs = sum_abs / sample_count;
+        s_tx_left_peak = left_peak;
+        s_tx_right_peak = right_peak;
+        s_tx_left_avg = (uint32_t)(left_sum / (sample_count / 2));
+        s_tx_right_avg = (uint32_t)(right_sum / (sample_count / 2));
+
+        if (s_tx_raw_frames < 8) {
+            ESP_LOGI(TAG,
+                     "I2S RX raw #%lu: Lpeak=%lu Lavg=%lu Rpeak=%lu Ravg=%lu; "
+                     "samples=%d,%d,%d,%d,%d,%d,%d,%d",
+                     (unsigned long)s_tx_raw_frames,
+                     (unsigned long)s_tx_left_peak, (unsigned long)s_tx_left_avg,
+                     (unsigned long)s_tx_right_peak, (unsigned long)s_tx_right_avg,
+                     samples[0], samples[1], samples[2], samples[3],
+                     samples[4], samples[5], samples[6], samples[7]);
+            s_tx_raw_frames++;
+        }
 
         int sent = sendto(s_audio_socket, buffer, sizeof(buffer), 0,
                           (struct sockaddr *)&peer, peer_len);
