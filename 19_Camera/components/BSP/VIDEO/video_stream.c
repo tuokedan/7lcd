@@ -118,7 +118,7 @@ static esp_err_t pc_video_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    if (s_pc_jpeg == NULL || s_pc_rgb565 == NULL) {
+    if (s_pc_jpeg == NULL || s_pc_rgb888 == NULL || s_pc_rgb565 == NULL) {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Video buffers unavailable");
         return ESP_FAIL;
     }
