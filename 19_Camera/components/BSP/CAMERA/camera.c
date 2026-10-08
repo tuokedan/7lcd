@@ -136,6 +136,12 @@ void camera_show(uint16_t x, uint16_t y)
         return;
     }
 
+    /*
+     * AUDIO_DIAG_MODE: keep camera capture + LCD display only.
+     * YOLO inference is intentionally disabled here because synchronous
+     * inference was contributing to camera VSYNC overflow / watchdog resets.
+     */
+#if !AUDIO_DIAG_MODE
     (void)yolo_person_submit_frame(fb->buf, fb->width, fb->height);
 
     yolo_detection_t detection;
@@ -143,6 +149,7 @@ void camera_show(uint16_t x, uint16_t y)
         detection.confidence >= 0.35f) {
         draw_detection_box(fb->buf, fb->width, fb->height, &detection);
     }
+#endif
 
     /*
      * PC 回传视频运行时，video_stream.c 会直接把 PC 画面刷到 LCD。
@@ -170,7 +177,9 @@ void camera_show(uint16_t x, uint16_t y)
         lcd_unlock();
     }
 
+#if !AUDIO_DIAG_MODE
     video_stream_publish_frame(fb);
+#endif
 
     esp_camera_fb_return(fb);
 }
