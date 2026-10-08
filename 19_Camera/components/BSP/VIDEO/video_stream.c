@@ -57,6 +57,7 @@ static SemaphoreHandle_t s_buffer_mutex = NULL;
 static bool s_started = false;
 static int64_t s_last_encode_us = 0;
 static volatile int64_t s_last_pc_video_us = 0;
+static bool s_pc_color_test_done = false;
 #define PC_VIDEO_ACTIVE_TIMEOUT_US 1500000
 
 static size_t jpeg_write_cb(void *arg, size_t index, const void *data, size_t len)
@@ -178,6 +179,24 @@ static esp_err_t pc_video_handler(httpd_req_t *req)
 
         s_pc_rgb565[pixel * 2 + 0] = (uint8_t)(rgb565 >> 8);
         s_pc_rgb565[pixel * 2 + 1] = (uint8_t)(rgb565 & 0xFF);
+    }
+
+    if (!s_pc_color_test_done) {
+        const uint16_t colors[5] = {0x0000, 0xF800, 0x07E0, 0x001F, 0xFFFF};
+        const size_t bar_pixels = (320 * 240) / 5;
+        for (size_t pixel = 0; pixel < 320 * 240; ++pixel) {
+            size_t bar = pixel / bar_pixels;
+            if (bar > 4) bar = 4;
+            uint16_t color = colors[bar];
+            s_pc_rgb565[pixel * 2] = (uint8_t)(color >> 8);
+            s_pc_rgb565[pixel * 2 + 1] = (uint8_t)(color & 0xFF);
+        }
+        ESP_LOGI(TAG, "PC video LCD color test: BLACK / RED / GREEN / BLUE / WHITE");
+        lcd_lock();
+        lcd_show_picture(s_pc_rgb565);
+        lcd_unlock();
+        vTaskDelay(pdMS_TO_TICKS(500));
+        s_pc_color_test_done = true;
     }
 
     /* 收到 PC 画面即认为反向视频处于活动状态；camera_show() 会暂停本机摄像头刷屏。 */
