@@ -158,13 +158,13 @@ static esp_err_t es8388_init(void)
         /* LIN1/RIN1 are the ADC inputs on this board. */
         {ES8388_ADCCONTROL2, 0x00},
         {ES8388_ADCCONTROL3, 0x02},
-        {ES8388_ADCCONTROL4, 0x0C},
+        {ES8388_ADCCONTROL4, 0x0D},
         {ES8388_ADCCONTROL5, 0x02},
         /* ADC digital volume = 0 dB. */
         {ES8388_ADCCONTROL8, 0x00},
         {ES8388_ADCCONTROL9, 0x00},
         /* MIC PGA: 24 dB on both L/R channels (8 << 4 | 8 = 0x88), exactly as es8388_set_mic_gain(24dB). */
-        {ES8388_ADCCONTROL1, 0x88},
+        {ES8388_ADCCONTROL1, 0xBB},
         {ES8388_ADCCONTROL10,0xEA},
         {ES8388_ADCCONTROL11,0xC0},
         {ES8388_ADCCONTROL12,0x12},
@@ -184,15 +184,8 @@ static esp_err_t es8388_init(void)
          * before DACCONTROL21 was changed, so the ES8388 internal
          * state machine was never explicitly restarted at this point.
          */
-        {ES8388_DACCONTROL21, 0x80},
-        {ES8388_CHIPPOWER,    0xF0},
-        {ES8388_CHIPPOWER,    0x00},
-
-        /*
-         * es8388_ctrl_state(BOTH, START) in the proven recorder finally
-         * powers the ADC/line-input path with ADCPOWER=0x00.
-         */
-        {ES8388_ADCPOWER,    0x00},
+        /* The original recorder leaves DACCONTROL21 at 0x80; no extra state-machine pulse. */
+        {ES8388_ADCPOWER,    0x09},
     };
 
     for (size_t i = 0; i < sizeof(init_regs) / sizeof(init_regs[0]); ++i) {
@@ -231,7 +224,11 @@ static esp_err_t es8388_init(void)
     }
     es8388_log_reg(ES8388_ADCPOWER, "ADCPOWER(final)");
 
-    ESP_LOGI(TAG, "ES8388 initialized: ADC I2S normal/16-bit, MIC PGA L/R=24dB (0x88), ADCPOWER=0x00");
+    /* The original board driver calls es8388_set_mic_gain(24dB) last; it writes 0x08. */
+    esp_err_t gain_ret = es8388_write_reg(ES8388_ADCCONTROL1, 0x08);
+    if (gain_ret != ESP_OK) return gain_ret;
+    es8388_log_reg(ES8388_ADCCONTROL1, "ADCCONTROL1(final)");
+    ESP_LOGI(TAG, "ES8388 initialized to board-recorder state: ADC I2S normal/16-bit, MIC_GAIN_24DB=0x08, ADCPOWER=0x00");
     return ESP_OK;
 }
 
