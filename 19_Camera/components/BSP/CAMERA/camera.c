@@ -145,27 +145,30 @@ void camera_show(uint16_t x, uint16_t y)
     }
 
     /*
-     * LCD 与 PC 回传显示共用 SPI2，必须串行化。
-     * 只锁住实际刷屏过程，JPEG 编码在锁外进行。
+     * PC 回传视频运行时，video_stream.c 会直接把 PC 画面刷到 LCD。
+     * 此时这里不能再刷摄像头，否则两个任务会交替改写同一块 LCD，导致画面闪烁/错乱。
+     * PC 回传停止约 1.5 秒后自动恢复本机摄像头显示。
      */
-    lcd_lock();
+    if (!video_stream_pc_video_active()) {
+        lcd_lock();
 
-    lcd_set_window(x, y, x + fb->width - 1, y + fb->height - 1);
+        lcd_set_window(x, y, x + fb->width - 1, y + fb->height - 1);
 
-    const size_t chunk_size = 11520;
-    size_t offset = 0;
+        const size_t chunk_size = 11520;
+        size_t offset = 0;
 
-    while (offset < fb->len) {
-        size_t chunk = fb->len - offset;
-        if (chunk > chunk_size) {
-            chunk = chunk_size;
+        while (offset < fb->len) {
+            size_t chunk = fb->len - offset;
+            if (chunk > chunk_size) {
+                chunk = chunk_size;
+            }
+
+            lcd_write_datan(fb->buf + offset, (uint16_t)chunk);
+            offset += chunk;
         }
 
-        lcd_write_datan(fb->buf + offset, (uint16_t)chunk);
-        offset += chunk;
+        lcd_unlock();
     }
-
-    lcd_unlock();
 
     video_stream_publish_frame(fb);
 
