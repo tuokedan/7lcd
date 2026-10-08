@@ -149,6 +149,20 @@ static esp_err_t pc_video_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
+    /*
+     * lcd_show_picture() 直接把 RGB565 原始字节发送给 ST7789，
+     * 而本工程摄像头/LCD链路使用的是高字节在前（RGB565 BE）。
+     *
+     * jpg2rgb565() 的解码输出在当前 esp32-camera / ESP-JPEG 链路
+     * 中可能是低字节在前，因此这里统一交换每个像素的两个字节。
+     * 不改摄像头原始帧，避免影响已经正常的 OV2640 -> LCD 路径。
+     */
+    for (size_t i = 0; i + 1 < PC_VIDEO_RGB_SIZE; i += 2) {
+        uint8_t tmp = s_pc_rgb565[i];
+        s_pc_rgb565[i] = s_pc_rgb565[i + 1];
+        s_pc_rgb565[i + 1] = tmp;
+    }
+
     /* 收到 PC 画面即认为反向视频处于活动状态；camera_show() 会暂停本机摄像头刷屏。 */
     s_last_pc_video_us = esp_timer_get_time();
 
