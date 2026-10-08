@@ -143,7 +143,7 @@ uint8_t Serial_ReadByte(uint8_t *Byte)
 
 void USART1_IRQHandler(void)
 {
-	if(USART_GetFlagStatus(USART1,USART_IT_RXNE) == SET)
+	if(USART_GetITStatus(USART1,USART_IT_RXNE) == SET)
 	{
 		uint8_t data = (uint8_t)USART_ReceiveData(USART1);
 		uint8_t next_head = (uint8_t)((Serial_RxHead + 1) % SERIAL_RX_BUFFER_SIZE);
