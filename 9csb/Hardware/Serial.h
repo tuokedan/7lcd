@@ -12,5 +12,6 @@ void Serial_Printf(char *format, ...);
 
 uint8_t Serial_GetRxFlag(void);
 uint8_t Serial_GetRxData(void);
+uint8_t Serial_ReadByte(uint8_t *Byte);
 
 #endif
