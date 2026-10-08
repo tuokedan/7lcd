@@ -172,12 +172,12 @@ static esp_err_t pc_video_handler(httpd_req_t *req)
          * ST7789 使用 16-bit RGB565，数据高字节在前。
          */
         const uint16_t rgb565 =
-            (static_cast<uint16_t>(r & 0xF8) << 8) |
-            (static_cast<uint16_t>(g & 0xFC) << 3) |
-            (static_cast<uint16_t>(b) >> 3);
+            ((uint16_t)(r & 0xF8) << 8) |
+            ((uint16_t)(g & 0xFC) << 3) |
+            ((uint16_t)b >> 3);
 
-        s_pc_rgb565[pixel * 2 + 0] = static_cast<uint8_t>(rgb565 >> 8);
-        s_pc_rgb565[pixel * 2 + 1] = static_cast<uint8_t>(rgb565 & 0xFF);
+        s_pc_rgb565[pixel * 2 + 0] = (uint8_t)(rgb565 >> 8);
+        s_pc_rgb565[pixel * 2 + 1] = (uint8_t)(rgb565 & 0xFF);
     }
 
     /* 收到 PC 画面即认为反向视频处于活动状态；camera_show() 会暂停本机摄像头刷屏。 */
