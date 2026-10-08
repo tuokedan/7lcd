@@ -427,6 +427,22 @@ static void start_http_server(void)
              VIDEO_HTTP_PORT + 1);
 }
 
+void video_stream_init_wifi_only(void)
+{
+    if (s_started) {
+        return;
+    }
+
+    if (!start_wifi_ap()) {
+        ESP_LOGE(TAG, "Wi-Fi AP startup failed");
+        return;
+    }
+
+    /* Audio diagnostic mode deliberately skips HTTP servers and all video buffers. */
+    s_started = true;
+    ESP_LOGI(TAG, "Wi-Fi-only mode started: HTTP/video disabled for audio diagnostics");
+}
+
 void video_stream_init(void)
 {
     if (s_started) {
