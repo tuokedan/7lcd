@@ -157,13 +157,13 @@ static esp_err_t es8388_init(void)
         /* LIN1/RIN1 are the ADC inputs on this board. */
         {ES8388_ADCCONTROL2, 0x00},
         {ES8388_ADCCONTROL3, 0x02},
-        {ES8388_ADCCONTROL4, 0x0D},
+        {ES8388_ADCCONTROL4, 0x0C},
         {ES8388_ADCCONTROL5, 0x02},
         /* ADC digital volume = 0 dB. */
         {ES8388_ADCCONTROL8, 0x00},
         {ES8388_ADCCONTROL9, 0x00},
-        /* MIC PGA: 24 dB, exactly as the proven recorder example. */
-        {ES8388_ADCCONTROL1, 0x08},
+        /* MIC PGA: 24 dB on both L/R channels (8 << 4 | 8 = 0x88), exactly as es8388_set_mic_gain(24dB). */
+        {ES8388_ADCCONTROL1, 0x88},
         {ES8388_ADCCONTROL10,0xEA},
         {ES8388_ADCCONTROL11,0xC0},
         {ES8388_ADCCONTROL12,0x12},
@@ -212,6 +212,7 @@ static esp_err_t es8388_init(void)
     es8388_log_reg(ES8388_ADCCONTROL2, "ADCCONTROL2");
     es8388_log_reg(ES8388_ADCCONTROL3, "ADCCONTROL3");
     es8388_log_reg(ES8388_ADCCONTROL4, "ADCCONTROL4");
+    es8388_log_reg(ES8388_ADCCONTROL4, "ADCCONTROL4");
     es8388_log_reg(ES8388_ADCCONTROL5, "ADCCONTROL5");
     es8388_log_reg(ES8388_ADCCONTROL8, "ADCCONTROL8");
     es8388_log_reg(ES8388_ADCCONTROL9, "ADCCONTROL9");
@@ -229,7 +230,7 @@ static esp_err_t es8388_init(void)
     }
     es8388_log_reg(ES8388_ADCPOWER, "ADCPOWER(final)");
 
-    ESP_LOGI(TAG, "ES8388 initialized: recorder-compatible ADC path, MIC PGA=24dB, ADCPOWER=0x00");
+    ESP_LOGI(TAG, "ES8388 initialized: ADC I2S normal/16-bit, MIC PGA L/R=24dB (0x88), ADCPOWER=0x00");
     return ESP_OK;
 }
 
