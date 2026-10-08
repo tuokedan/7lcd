@@ -287,10 +287,32 @@ static esp_err_t audio_i2s_init(void)
         return ret;
     }
 
+    /* Explicitly program the legacy I2S clock, then start the peripheral. */
+    ret = i2s_set_clk(AUDIO_I2S_TX_PORT, AUDIO_SAMPLE_RATE,
+                      I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_STEREO);
+    if (ret != ESP_OK) {
+        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
+        return ret;
+    }
+
     ret = i2s_start(AUDIO_I2S_TX_PORT);
     if (ret != ESP_OK) {
         i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
         return ret;
+    }
+
+    /*
+     * In the legacy driver the master clock/data clock can remain idle until
+     * the first DMA transaction. Prime TX with one silent stereo frame so the
+     * external ES8388 sees MCLK/BCLK/LRCK immediately.
+     */
+    int16_t prime[2] = {0, 0};
+    size_t prime_written = 0;
+    ret = i2s_write(AUDIO_I2S_TX_PORT, prime, sizeof(prime),
+                    &prime_written, pdMS_TO_TICKS(100));
+    if (ret != ESP_OK || prime_written != sizeof(prime)) {
+        ESP_LOGW(TAG, "I2S clock prime: ret=%s bytes=%u",
+                 esp_err_to_name(ret), (unsigned)prime_written);
     }
 
     ESP_LOGI(TAG,
@@ -298,6 +320,7 @@ static esp_err_t audio_i2s_init(void)
              "MCLK=%d BCLK=%d LRCK=%d DOUT=%d DIN=%d",
              AUDIO_MCLK, AUDIO_BCLK, AUDIO_LRCK, AUDIO_DOUT, AUDIO_DIN);
 
+    /* Verify the physical clock/data pins after the first DMA transaction. */
     const gpio_num_t diag_pins[] = {AUDIO_MCLK, AUDIO_BCLK, AUDIO_LRCK, AUDIO_DIN};
     const char *diag_names[] = {"GPIO0 MCLK", "GPIO14 BCLK", "GPIO19 LRCK", "GPIO20 ASDOUT"};
     for (size_t p = 0; p < 4; ++p) {
