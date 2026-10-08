@@ -3,7 +3,9 @@
 #include "freertos/task.h"
 #include "esp_camera.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "driver/gpio.h"
+#include "driver/uart.h"
 #include "lcd.h"
 #include "yolo_person.h"
 #include "video_stream.h"
@@ -11,6 +13,24 @@
 #include <stdint.h>
 
 static const char *TAG = "camera";
+
+/*
+ * ESP32-S3 -> STM32F103C8T6
+ * UART1 TX = GPIO40, RX = GPIO39
+ * 115200 8N1
+ *
+ * 当前只使用 TX：
+ *   ESP32 GPIO40 -> STM32 PA10 (USART1_RX)
+ *   GND          -> GND
+ *
+ * GPIO39/40 未被当前摄像头、LCD、音频配置占用。
+ */
+#define ROBOT_UART       UART_NUM_1
+#define ROBOT_UART_TX    GPIO_NUM_40
+#define ROBOT_UART_RX    GPIO_NUM_39
+#define ROBOT_UART_BAUD  115200
+
+static bool s_robot_uart_ready = false;
 
 static camera_config_t camera_config = {
     .pin_pwdn = CAM_PIN_PWDN,
@@ -99,6 +119,147 @@ static void draw_detection_box(uint8_t *buf,
     }
 }
 
+static void robot_uart_init(void)
+{
+    if (s_robot_uart_ready) {
+        return;
+    }
+
+    const uart_config_t config = {
+        .baud_rate = ROBOT_UART_BAUD,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .rx_flow_ctrl_thresh = 0,
+#if ESP_IDF_VERSION_MAJOR >= 5
+        .source_clk = UART_SCLK_DEFAULT,
+#endif
+    };
+
+    esp_err_t err = uart_driver_install(
+        ROBOT_UART, 256, 256, 0, NULL, 0);
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "Robot UART driver install failed: 0x%x", err);
+        return;
+    }
+
+    err = uart_param_config(ROBOT_UART, &config);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Robot UART config failed: 0x%x", err);
+        return;
+    }
+
+    err = uart_set_pin(
+        ROBOT_UART,
+        ROBOT_UART_TX,
+        ROBOT_UART_RX,
+        UART_PIN_NO_CHANGE,
+        UART_PIN_NO_CHANGE);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Robot UART pin config failed: 0x%x", err);
+        return;
+    }
+
+    s_robot_uart_ready = true;
+    ESP_LOGI(TAG,
+             "Robot UART ready: TX GPIO40 -> STM32 PA10, 115200 8N1");
+}
+
+/*
+ * LEFT/RIGHT 为 -100~100。
+ * 正数前进，负数后退。
+ * 协议：AA 55 LEFT RIGHT CHECK
+ */
+static void robot_send_speed(int8_t left, int8_t right)
+{
+    if (!s_robot_uart_ready) {
+        return;
+    }
+
+    uint8_t packet[5];
+    packet[0] = 0xAA;
+    packet[1] = 0x55;
+    packet[2] = (uint8_t)left;
+    packet[3] = (uint8_t)right;
+    packet[4] = (uint8_t)(packet[0] ^ packet[1] ^ packet[2] ^ packet[3]);
+
+    (void)uart_write_bytes(ROBOT_UART, packet, sizeof(packet));
+}
+
+static int clamp_speed(int value)
+{
+    if (value > 100) return 100;
+    if (value < -100) return -100;
+    return value;
+}
+
+/*
+ * 根据人物框中心控制转向，根据人物框高度粗略估计距离。
+ *
+ * 320x240 图像：
+ *   cx < 135       -> 向左
+ *   135~185        -> 基本直行
+ *   cx > 185       -> 向右
+ *
+ * 人物框越高，说明人越近，车速越低；
+ * 高度 >= 170 像素时停车，防止跟得过近。
+ */
+static void robot_follow_person(const yolo_detection_t *detection)
+{
+    if (detection == NULL ||
+        detection->confidence < 0.35f) {
+        robot_send_speed(0, 0);
+        return;
+    }
+
+    const float cx = (detection->x1 + detection->x2) * 0.5f;
+    const float box_height = detection->y2 - detection->y1;
+
+    if (box_height >= 170.0f) {
+        robot_send_speed(0, 0);
+        return;
+    }
+
+    int base_speed;
+
+    if (box_height < 55.0f) {
+        base_speed = 70;
+    } else if (box_height < 85.0f) {
+        base_speed = 55;
+    } else if (box_height < 115.0f) {
+        base_speed = 40;
+    } else {
+        base_speed = 22;
+    }
+
+    float error = cx - 160.0f;
+
+    if (error > -20.0f && error < 20.0f) {
+        error = 0.0f;
+    }
+
+    /* 比例转向，右侧目标 -> 左轮加速、右轮减速。 */
+    int turn = (int)(error * 0.35f);
+
+    if (turn > 45) turn = 45;
+    if (turn < -45) turn = -45;
+
+    /*
+     * 人偏得很厉害时降低前进速度，让车辆优先把车头转向人。
+     */
+    if (error > 100.0f || error < -100.0f) {
+        if (base_speed > 25) {
+            base_speed = 25;
+        }
+    }
+
+    int left = clamp_speed(base_speed + turn);
+    int right = clamp_speed(base_speed - turn);
+
+    robot_send_speed((int8_t)left, (int8_t)right);
+}
+
 void camera_init(void)
 {
     CAM_RST(0);
@@ -112,6 +273,8 @@ void camera_init(void)
         return;
     }
 
+    robot_uart_init();
+
     sensor_t *sensor = esp_camera_sensor_get();
     if (sensor != NULL) {
         ESP_LOGI(TAG, "Camera sensor initialized");
@@ -124,6 +287,7 @@ void camera_show(uint16_t x, uint16_t y)
     camera_fb_t *fb = esp_camera_fb_get();
     if (fb == NULL) {
         ESP_LOGW(TAG, "Camera frame capture failed");
+        robot_send_speed(0, 0);
         return;
     }
 
@@ -132,24 +296,26 @@ void camera_show(uint16_t x, uint16_t y)
         y + fb->height > LCD_HEIGHT) {
         ESP_LOGW(TAG, "Unsupported frame: %ux%u format=%d",
                  fb->width, fb->height, fb->format);
+        robot_send_speed(0, 0);
         esp_camera_fb_return(fb);
         return;
     }
 
-    /* Run YOLO person detection on the captured frame. */
     (void)yolo_person_submit_frame(fb->buf, fb->width, fb->height);
 
     yolo_detection_t detection;
-    if (yolo_person_get_latest_detection(&detection) &&
-        detection.confidence >= 0.35f) {
+    bool have_detection =
+        yolo_person_get_latest_detection(&detection) &&
+        detection.confidence >= 0.35f;
+
+    if (have_detection) {
         draw_detection_box(fb->buf, fb->width, fb->height, &detection);
+        robot_follow_person(&detection);
+    } else {
+        /* 没检测到人，立即停车。 */
+        robot_send_speed(0, 0);
     }
 
-    /*
-     * PC 回传视频运行时，video_stream.c 会直接把 PC 画面刷到 LCD。
-     * 此时这里不能再刷摄像头，否则两个任务会交替改写同一块 LCD，导致画面闪烁/错乱。
-     * PC 回传停止约 1.5 秒后自动恢复本机摄像头显示。
-     */
     if (!video_stream_pc_video_active()) {
         lcd_lock();
 
