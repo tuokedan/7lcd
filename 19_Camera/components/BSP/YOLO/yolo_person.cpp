@@ -19,6 +19,9 @@ static constexpr uint16_t FRAME_WIDTH = YOLO_CAMERA_WIDTH;
 static constexpr uint16_t FRAME_HEIGHT = YOLO_CAMERA_HEIGHT;
 static constexpr size_t FRAME_BYTES =
     static_cast<size_t>(FRAME_WIDTH) * FRAME_HEIGHT * 2;
+static constexpr uint16_t MODEL_SIZE = 224;
+static constexpr size_t MODEL_BYTES =
+    static_cast<size_t>(MODEL_SIZE) * MODEL_SIZE * 2;
 static constexpr int BUFFER_COUNT = 2;
 
 /* 当前 PICO_S8_V1 单次推理约 300 ms。限制送入频率，避免 CPU1 连续满载。 */
@@ -27,6 +30,7 @@ static int64_t s_last_submit_us = 0;
 
 static PedestrianDetect *s_detector = nullptr;
 static uint8_t *s_frame_buffers[BUFFER_COUNT] = {nullptr, nullptr};
+static uint8_t *s_model_buffer = nullptr;
 
 /* 0=空闲，1=已排队，2=正在推理。 */
 static volatile uint8_t s_buffer_state[BUFFER_COUNT] = {0, 0};
@@ -35,6 +39,8 @@ static QueueHandle_t s_frame_queue = nullptr;
 static portMUX_TYPE s_result_mux = portMUX_INITIALIZER_UNLOCKED;
 static yolo_detection_t s_latest_detection = {};
 static bool s_latest_valid = false;
+static int64_t s_latest_result_us = 0;
+static constexpr int64_t DETECTION_MAX_AGE_US = 900000;
 
 static bool find_free_buffer(int *index)
 {
@@ -67,9 +73,65 @@ static void update_latest_detection(const yolo_detection_t *detection,
     portENTER_CRITICAL(&s_result_mux);
     if (valid && detection != nullptr) {
         s_latest_detection = *detection;
+        s_latest_result_us = esp_timer_get_time();
+    } else {
+        s_latest_result_us = 0;
     }
     s_latest_valid = valid;
     portEXIT_CRITICAL(&s_result_mux);
+}
+
+static inline void rgb565_black(uint8_t *dst)
+{
+    dst[0] = 0;
+    dst[1] = 0;
+}
+
+/*
+ * OV2640: 320x240 (4:3)
+ * PICO_S8_V1: 224x224 (1:1)
+ *
+ * 采用等比例缩放：
+ *   320x240 -> 224x168
+ *   上下各留 28 像素黑边
+ *
+ * 这样模型看到的目标几何比例与原始画面一致，检测框再反算回
+ * 320x240 时不会因为 4:3 -> 1:1 拉伸而产生系统性偏移。
+ */
+static void make_letterbox_rgb565(const uint8_t *src,
+                                  uint16_t width,
+                                  uint16_t height,
+                                  uint8_t *dst)
+{
+    const float scale = (MODEL_SIZE * 1.0f) /
+                        ((width > height) ? width : height);
+    const int resized_w = static_cast<int>(width * scale + 0.5f);
+    const int resized_h = static_cast<int>(height * scale + 0.5f);
+    const int pad_x = (MODEL_SIZE - resized_w) / 2;
+    const int pad_y = (MODEL_SIZE - resized_h) / 2;
+
+    for (size_t i = 0; i < MODEL_BYTES; i += 2) {
+        rgb565_black(dst + i);
+    }
+
+    for (int dy = 0; dy < resized_h; ++dy) {
+        int sy = static_cast<int>((dy + 0.5f) / scale);
+        if (sy >= height) sy = height - 1;
+
+        for (int dx = 0; dx < resized_w; ++dx) {
+            int sx = static_cast<int>((dx + 0.5f) / scale);
+            if (sx >= width) sx = width - 1;
+
+            const size_t src_off =
+                (static_cast<size_t>(sy) * width + sx) * 2;
+            const size_t dst_off =
+                (static_cast<size_t>(dy + pad_y) * MODEL_SIZE +
+                 (dx + pad_x)) * 2;
+
+            dst[dst_off] = src[src_off];
+            dst[dst_off + 1] = src[src_off + 1];
+        }
+    }
 }
 
 static void yolo_task(void *arg)
@@ -166,6 +228,23 @@ extern "C" void yolo_person_init(void)
         }
     }
 
+    s_model_buffer = static_cast<uint8_t *>(
+        heap_caps_malloc(MODEL_BYTES,
+                         MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+
+    if (s_model_buffer == nullptr) {
+        ESP_LOGE(TAG, "Failed to allocate 224x224 model buffer");
+
+        for (int i = 0; i < BUFFER_COUNT; ++i) {
+            heap_caps_free(s_frame_buffers[i]);
+            s_frame_buffers[i] = nullptr;
+        }
+
+        delete s_detector;
+        s_detector = nullptr;
+        return;
+    }
+
     s_frame_queue = xQueueCreate(BUFFER_COUNT, sizeof(uint8_t));
     if (s_frame_queue == nullptr) {
         ESP_LOGE(TAG, "Failed to create frame queue");
@@ -174,6 +253,8 @@ extern "C" void yolo_person_init(void)
             heap_caps_free(s_frame_buffers[i]);
             s_frame_buffers[i] = nullptr;
         }
+        heap_caps_free(s_model_buffer);
+        s_model_buffer = nullptr;
 
         delete s_detector;
         s_detector = nullptr;
@@ -199,6 +280,8 @@ extern "C" void yolo_person_init(void)
             heap_caps_free(s_frame_buffers[i]);
             s_frame_buffers[i] = nullptr;
         }
+        heap_caps_free(s_model_buffer);
+        s_model_buffer = nullptr;
 
         delete s_detector;
         s_detector = nullptr;
@@ -207,7 +290,7 @@ extern "C" void yolo_person_init(void)
 
     ESP_LOGI(TAG, "Pedestrian detector initialized");
     ESP_LOGI(TAG, "Target: pedestrian/person");
-    ESP_LOGI(TAG, "PICO input: 224x224, inference runs on CPU1");
+    ESP_LOGI(TAG, "PICO input: 224x224 letterbox, inference runs on CPU1");
 }
 
 extern "C" bool yolo_person_submit_frame(const uint8_t *rgb565,
@@ -253,13 +336,27 @@ extern "C" bool yolo_person_get_latest_detection(
     }
 
     bool valid;
+    int64_t result_us;
 
     portENTER_CRITICAL(&s_result_mux);
     *detection = s_latest_detection;
     valid = s_latest_valid;
+    result_us = s_latest_result_us;
     portEXIT_CRITICAL(&s_result_mux);
 
-    return valid;
+    if (!valid || result_us == 0) {
+        return false;
+    }
+
+    /*
+     * 推理约 300~400 ms。超过这个时间的结果很容易对应到明显更早
+     * 的画面，宁可暂时不画框，也不要把旧框叠到新画面上。
+     */
+    if (esp_timer_get_time() - result_us > DETECTION_MAX_AGE_US) {
+        return false;
+    }
+
+    return true;
 }
 
 extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
@@ -282,10 +379,16 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
     detection->confidence = 0.0f;
     detection->class_id = -1;
 
+    if (s_model_buffer == nullptr) {
+        return false;
+    }
+
+    make_letterbox_rgb565(rgb565, width, height, s_model_buffer);
+
     dl::image::img_t image = {
-        .data = const_cast<uint8_t *>(rgb565),
-        .width = width,
-        .height = height,
+        .data = s_model_buffer,
+        .width = MODEL_SIZE,
+        .height = MODEL_SIZE,
         .pix_type = dl::image::DL_IMAGE_PIX_TYPE_RGB565BE,
     };
 
@@ -303,10 +406,32 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
             continue;
         }
 
-        detection->x1 = static_cast<float>(result.box[0]);
-        detection->y1 = static_cast<float>(result.box[1]);
-        detection->x2 = static_cast<float>(result.box[2]);
-        detection->y2 = static_cast<float>(result.box[3]);
+        /*
+         * 模型坐标系是 224x224 letterbox：
+         *   x: 无水平 padding
+         *   y: 上下各 28 px padding
+         *   scale = 224 / 320 = 0.7
+         *
+         * 反算回摄像头原始 320x240 坐标。
+         */
+        constexpr float scale = 224.0f / 320.0f;
+        constexpr float pad_x = 0.0f;
+        constexpr float pad_y = 28.0f;
+
+        float x1 = (static_cast<float>(result.box[0]) - pad_x) / scale;
+        float y1 = (static_cast<float>(result.box[1]) - pad_y) / scale;
+        float x2 = (static_cast<float>(result.box[2]) - pad_x) / scale;
+        float y2 = (static_cast<float>(result.box[3]) - pad_y) / scale;
+
+        if (x1 < 0.0f) x1 = 0.0f;
+        if (y1 < 0.0f) y1 = 0.0f;
+        if (x2 > width - 1) x2 = width - 1;
+        if (y2 > height - 1) y2 = height - 1;
+
+        detection->x1 = x1;
+        detection->y1 = y1;
+        detection->x2 = x2;
+        detection->y2 = y2;
         detection->confidence = result.score;
         detection->class_id = YOLO_PERSON_CLASS;
 
