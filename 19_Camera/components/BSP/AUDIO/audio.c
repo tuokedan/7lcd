@@ -151,16 +151,18 @@ static esp_err_t es8388_init(void)
         {ES8388_DACCONTROL4, 0x00},
         {ES8388_DACCONTROL5, 0x00},
 
-        /* ADC configuration. */
+        /* ADC configuration: copied from the board's proven 1_15_recorder. */
         {ES8388_ADCPOWER,    0xFF},
-        {ES8388_ADCCONTROL1, 0xBB},
-        /* Schematic: MIC1 is connected to ES8388 LIN1. */
+        /* LIN1/RIN1 are the ADC inputs on this board. */
         {ES8388_ADCCONTROL2, 0x00},
         {ES8388_ADCCONTROL3, 0x02},
         {ES8388_ADCCONTROL4, 0x0D},
         {ES8388_ADCCONTROL5, 0x02},
+        /* ADC digital volume = 0 dB. */
         {ES8388_ADCCONTROL8, 0x00},
         {ES8388_ADCCONTROL9, 0x00},
+        /* MIC PGA: 24 dB, exactly as the proven recorder example. */
+        {ES8388_ADCCONTROL1, 0x08},
         {ES8388_ADCCONTROL10,0xEA},
         {ES8388_ADCCONTROL11,0xC0},
         {ES8388_ADCCONTROL12,0x12},
@@ -169,7 +171,13 @@ static esp_err_t es8388_init(void)
 
         {ES8388_DACPOWER,    0x3C},
         {ES8388_DACCONTROL3, 0x00},
-        {ES8388_ADCPOWER,    0x09},
+        /*
+         * es8388_ctrl_state(BOTH, START) in the proven recorder finally
+         * powers the ADC/line-input path with ADCPOWER=0x00.
+         * 0x09 leaves MICBIAS powered down and was the key mismatch in
+         * the previous diagnostic implementation.
+         */
+        {ES8388_ADCPOWER,    0x00},
     };
 
     for (size_t i = 0; i < sizeof(init_regs) / sizeof(init_regs[0]); ++i) {
@@ -199,15 +207,15 @@ static esp_err_t es8388_init(void)
     es8388_log_reg(ES8388_ADCCONTROL13, "ADCCONTROL13");
     es8388_log_reg(ES8388_ADCCONTROL14, "ADCCONTROL14");
 
-    /* Match the proven board recorder: ADCPOWER final = 0x09. */
-    esp_err_t adc_power_ret = es8388_write_reg(ES8388_ADCPOWER, 0x09);
+    /* Match es8388_ctrl_state(BOTH, START): ADCPOWER must be 0x00. */
+    esp_err_t adc_power_ret = es8388_write_reg(ES8388_ADCPOWER, 0x00);
     if (adc_power_ret != ESP_OK) {
         ESP_LOGE(TAG, "ES8388 ADCPOWER final write failed: %s", esp_err_to_name(adc_power_ret));
         return adc_power_ret;
     }
     es8388_log_reg(ES8388_ADCPOWER, "ADCPOWER(final)");
 
-    ESP_LOGI(TAG, "ES8388 initialized: 16 kHz / 16-bit / stereo / I2S slave");
+    ESP_LOGI(TAG, "ES8388 initialized: recorder-compatible ADC path, MIC PGA=24dB, ADCPOWER=0x00");
     return ESP_OK;
 }
 
