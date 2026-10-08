@@ -2,6 +2,7 @@
 #define VIDEO_STREAM_H
 
 #include "esp_camera.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
