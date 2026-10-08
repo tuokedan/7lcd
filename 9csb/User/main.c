@@ -1,89 +1,151 @@
-#include "stm32f10x.h"                  // Device header
+#include "stm32f10x.h"
 #include "Delay.h"
 #include "robot.h"
 #include "UltrasonicWave.h"
-#include "Key.h"
 #include "Serial.h"
 #include "timer.h"
 #include "Buzzer.h"
 #include "Servo.h"
 
-// ³¬Éù²¨×ªÍ·º¯Êı
-int front_detection()
-{
-	int distance;
-	Servo_SetAngle(90);
-	Delay_ms(100);
-	distance = UltrasonicWave_StartMeasure();
-	return distance;
-}
+/*
+ * ESP32-S3 -> STM32F103C8T6 äººè·Ÿéšæ§åˆ¶
+ *
+ * åè®®ï¼šAA 55 LEFT RIGHT CHECK
+ * LEFT/RIGHT ä¸º int8_tï¼Œ-100~100ã€‚
+ * CHECK = AA ^ 55 ^ LEFT ^ RIGHT
+ *
+ * USART1ï¼šPA9 TXï¼ŒPA10 RXï¼Œ115200 8N1
+ *
+ * ä¼˜å…ˆçº§ï¼š
+ * 1. ESP32 é€šä¿¡è¶…æ—¶ -> åœè½¦
+ * 2. å‰æ–¹è¶…å£°æ³¢ < 60 cm -> åœè½¦
+ * 3. ESP32 äººè·Ÿéšå·¦å³è½®é€Ÿåº¦
+ */
 
-int left_detection()
-{
-	int distance;
-	Servo_SetAngle(175);
-	Delay_ms(300);
-	distance = UltrasonicWave_StartMeasure();
-	return distance;
-}
+#define ESP_CONTROL_TIMEOUT_MS 700
+#define OBSTACLE_STOP_CM_X10 600
 
-int right_detection()
+static int8_t g_left_speed = 0;
+static int8_t g_right_speed = 0;
+static uint16_t g_control_age_ms = ESP_CONTROL_TIMEOUT_MS;
+static int g_front_distance_x10 = 0;
+
+static void parse_esp_command(void)
 {
-	int distance;
-	Servo_SetAngle(5);
-	Delay_ms(300);
-	distance = UltrasonicWave_StartMeasure();
-	return distance;
+	static uint8_t state = 0;
+	static uint8_t left_byte = 0;
+	static uint8_t right_byte = 0;
+	uint8_t byte_value;
+
+	while(Serial_ReadByte(&byte_value))
+	{
+		switch(state)
+		{
+			case 0:
+				if(byte_value == 0xAA) state = 1;
+				break;
+
+			case 1:
+				if(byte_value == 0x55)
+				{
+					state = 2;
+				}
+				else if(byte_value != 0xAA)
+				{
+					state = 0;
+				}
+				break;
+
+			case 2:
+				left_byte = byte_value;
+				state = 3;
+				break;
+
+			case 3:
+				right_byte = byte_value;
+				state = 4;
+				break;
+
+			case 4:
+				if(byte_value == (uint8_t)(0xAA ^ 0x55 ^ left_byte ^ right_byte))
+				{
+					g_left_speed = (int8_t)left_byte;
+					g_right_speed = (int8_t)right_byte;
+					g_control_age_ms = 0;
+				}
+				state = 0;
+				break;
+
+			default:
+				state = 0;
+				break;
+		}
+	}
 }
 
 int main(void)
 {
-  int Q_temp,L_temp,R_temp;
-	Timerx_Init(5000,7199);  //10KhzµÄ¼ÆÊıÆµÂÊ£¬¼ÆÊıµ½5000Îª500ms 
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  //ÖĞ¶ÏÓÅÏÈ¼¶·Ö×é·Ö2×é
-	Key_Init();
-	Buzzer_Init();
-	UltrasonicWave_Init();      //¶Ô³¬Éù²¨Ä£¿é³õÊ¼»¯
-	Serial_Init();             // ´®¿Ú³õÊ¼»¯
-	robot_Init();              // »úÆ÷ÈË³õÊ¼»
-	Servo_Init();              // ¶æ»ú³õÊ¼»¯ 
-	while(Key_GetNum() == 0);  //µÈ´ı°´¼ü°´ÏÂ
-	while (1)
-	{
-			Q_temp = front_detection();
-			printf("²âµ½µÄ¾àÀëÖµÎª£º%d\r\n",Q_temp);
-			if(Q_temp<60 && Q_temp>0) //²âÁ¿¾àÀëÖµ	
-			{
-				makerobo_brake(500);		
-				makerobo_back(70,500);	
-				makerobo_brake(1000);	
-				
-				L_temp=left_detection();//²âÁ¿×ó±ßÕÏ°­ÎïµÄ¾àÀëÖµ
-				printf("²âµ½µÄ¾àÀëÖµÎª£º%d\r\n",L_temp);
-				Delay_ms(500);
-				R_temp=right_detection();//²âÁ¿ÓÒ±ßÕÏ°­ÎïµÄ¾àÀëÖµ
-				printf("²âµ½µÄ¾àÀëÖµÎª£º%d\r\n",R_temp);
-				Delay_ms(500);
-				
-				if((L_temp < 60 ) &&( R_temp < 60 ))//µ±×óÓÒÁ½²à¾ùÓĞÕÏ°­Îï¿¿µÄ±È½Ï½ü
-				{
-					makerobo_Spin_Left(60,500);
-				}				
-				else if(L_temp > R_temp)
-				{
-					makerobo_Left(70,700);
-					makerobo_brake(500);
-				}	
-				else
-				{
-					makerobo_Right(70,700);
-					makerobo_brake(500);					
-				}							
-			}	
-			else
-			{
-				makerobo_run(70,10);
-			}
+	uint16_t tick_ms = 0;
 
+	Timerx_Init(5000,7199);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+
+	Buzzer_Init();
+	UltrasonicWave_Init();
+	Serial_Init();
+	robot_Init();
+	Servo_Init();
+
+	/* è¶…å£°æ³¢èˆµæœºå›ºå®šæœæ­£å‰æ–¹ï¼Œåªåšå®‰å…¨åœè½¦ï¼Œä¸å†è‡ªåŠ¨å·¦å³æ‰«æã€‚ */
+	Servo_SetAngle(90);
+	robot_set_signed_speed(0,0);
+
+	Serial_Printf("
+ESP32 person-follow controller ready\r
+");
+	Serial_Printf("USART1 PA9/PA10 115200 8N1\r
+");
+
+	while(1)
+	{
+		parse_esp_command();
+
+		/* æ¯ 100 ms è§¦å‘ä¸€æ¬¡æ–°çš„å‰æ–¹æµ‹è·ã€‚ */
+		if(tick_ms == 0)
+		{
+			g_front_distance_x10 = UltrasonicWave_StartMeasure();
 		}
+
+		if(g_control_age_ms < ESP_CONTROL_TIMEOUT_MS)
+		{
+			g_control_age_ms++;
+		}
+
+		/*
+		 * å®‰å…¨ä¼˜å…ˆï¼š
+		 * é€šä¿¡ä¸­æ–­ã€æ²¡æœ‰æ£€æµ‹åˆ°äººï¼ˆESP32 ä¼šå‘é€ 0/0ï¼‰ã€æˆ–è¶…å£°æ³¢å‘ç°éšœç¢ï¼Œ
+		 * æœ€ç»ˆéƒ½ä¼šè®©è½¦è¾†åœä¸‹ã€‚
+		 */
+		if(g_control_age_ms >= ESP_CONTROL_TIMEOUT_MS)
+		{
+			robot_set_signed_speed(0,0);
+		}
+		else if(g_front_distance_x10 > 0 &&
+		        g_front_distance_x10 < OBSTACLE_STOP_CM_X10)
+		{
+			robot_set_signed_speed(0,0);
+		}
+		else
+		{
+			robot_set_signed_speed(g_left_speed,g_right_speed);
+		}
+
+		Delay_ms(1);
+
+		tick_ms++;
+		if(tick_ms >= 100)
+		{
+			tick_ms = 0;
+		}
+	}
 }
