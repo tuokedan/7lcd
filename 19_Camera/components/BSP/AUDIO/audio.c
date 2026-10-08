@@ -388,9 +388,18 @@ static void audio_tx_task(void *arg)
             continue;
         }
 
+        /*
+         * IMPORTANT: inspect the I2S RX data before checking whether the PC
+         * has sent anything. This lets us distinguish:
+         *   1) microphone/I2S RX is dead, from
+         *   2) microphone data is valid but there is no UDP peer yet.
+         *
+         * The previous code returned here when peer=NO, so a perfectly
+         * working microphone produced no raw-I2S diagnostic at all.
+         */
         struct sockaddr_storage peer;
         socklen_t peer_len;
-        if (!audio_get_peer(&peer, &peer_len)) continue;
+        bool peer_valid = audio_get_peer(&peer, &peer_len);
 
         const int16_t *samples = (const int16_t *)buffer;
         int32_t peak = 0;
@@ -414,7 +423,6 @@ static void audio_tx_task(void *arg)
                 right_sum += (uint32_t)a;
             }
         }
-        s_tx_packets++;
         s_tx_peak = peak;
         s_tx_sum_abs = sum_abs / sample_count;
         s_tx_left_peak = left_peak;
@@ -448,8 +456,15 @@ static void audio_tx_task(void *arg)
             s_tx_raw_frames++;
         }
 
+        if (!peer_valid) {
+            continue;
+        }
+
         int sent = sendto(s_audio_socket, buffer, sizeof(buffer), 0,
                           (struct sockaddr *)&peer, peer_len);
+        if (sent >= 0) {
+            s_tx_packets++;
+        }
         if (sent < 0 && errno != ENETUNREACH) {
             ESP_LOGW(TAG, "UDP audio send error: errno=%d", errno);
         }
