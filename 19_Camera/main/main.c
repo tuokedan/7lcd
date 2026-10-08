@@ -5,6 +5,7 @@
 #include "yolo_person.h"
 #include "video_stream.h"
 #include "audio.h"
+#include "esp_log.h"
 
 /*
  * Temporary stability/diagnostic switch.
