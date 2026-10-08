@@ -5,6 +5,7 @@
 
 #include "driver/i2c.h"
 #include "driver/i2s.h"
+#include "driver/gpio.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -298,6 +299,20 @@ static esp_err_t audio_i2s_init(void)
              "I2S recorder-compatible full-duplex: I2S0 master TX+RX; "
              "MCLK=%d BCLK=%d LRCK=%d DOUT=%d DIN=%d",
              AUDIO_MCLK, AUDIO_BCLK, AUDIO_LRCK, AUDIO_DOUT, AUDIO_DIN);
+
+    /* Hardware-level check of the physical ES8388 ASDOUT -> GPIO20 line. */
+    int last_level = gpio_get_level(AUDIO_DIN);
+    int ones = last_level ? 1 : 0;
+    int zeros = last_level ? 0 : 1;
+    int transitions = 0;
+    for (int i = 0; i < 20000; ++i) {
+        int level = gpio_get_level(AUDIO_DIN);
+        if (level) ++ones; else ++zeros;
+        if (level != last_level) ++transitions;
+        last_level = level;
+    }
+    ESP_LOGI(TAG, "GPIO20 ASDOUT pad diagnostic: 0=%d 1=%d transitions=%d",
+             zeros, ones, transitions);
     return ESP_OK;
 }
 
