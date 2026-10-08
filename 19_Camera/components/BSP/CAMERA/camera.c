@@ -10,6 +10,10 @@
 
 #include <stdint.h>
 
+#ifndef AUDIO_DIAG_MODE
+#define AUDIO_DIAG_MODE 1
+#endif
+
 static const char *TAG = "camera";
 
 static camera_config_t camera_config = {
