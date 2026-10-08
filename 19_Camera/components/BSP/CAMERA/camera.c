@@ -192,11 +192,11 @@ static void robot_send_speed(int8_t left, int8_t right)
  *
  * 不使用 YOLO 结果，不做距离/速度控制。
  * 上电后依次：
- *   STOP 1.5s
- *   LEFT 1.0s
- *   STOP 1.5s
- *   RIGHT 1.0s
- *   STOP 1.5s
+ *   STOP 1.0s
+ *   LEFT 1.5s
+ *   STOP 1.0s
+ *   RIGHT 1.5s
+ *   STOP 1.0s
  *
  * LEFT  = 左轮 -40，右轮 +40
  * RIGHT = 左轮 +40，右轮 -40
@@ -236,23 +236,23 @@ static void robot_uart_test(void)
         state_start_us = now_us;
         last_send_us = 0;
         ESP_LOGI(TAG, "=== ROBOT UART TEST START ===");
-        ESP_LOGI(TAG, "STOP 1.5s -> LEFT 1.0s -> STOP 1.5s -> RIGHT 1.0s -> STOP");
+        ESP_LOGI(TAG, "STOP 1.0s -> LEFT 1.5s -> STOP 1.0s -> RIGHT 1.5s -> STOP");
     }
 
     int64_t elapsed_us = now_us - state_start_us;
 
     switch (state) {
         case TEST_STOP_BEFORE:
-            if (elapsed_us >= 1500000) {
+            if (elapsed_us >= 1000000) {
                 state = TEST_LEFT;
                 state_start_us = now_us;
                 elapsed_us = 0;
-                ESP_LOGI(TAG, "UART TEST: LEFT (-40, +40)");
+                ESP_LOGI(TAG, "UART TEST: LEFT (-60, +60)");
             }
             break;
 
         case TEST_LEFT:
-            if (elapsed_us >= 1000000) {
+            if (elapsed_us >= 1500000) {
                 state = TEST_STOP_MIDDLE;
                 state_start_us = now_us;
                 elapsed_us = 0;
@@ -261,16 +261,16 @@ static void robot_uart_test(void)
             break;
 
         case TEST_STOP_MIDDLE:
-            if (elapsed_us >= 1500000) {
+            if (elapsed_us >= 1000000) {
                 state = TEST_RIGHT;
                 state_start_us = now_us;
                 elapsed_us = 0;
-                ESP_LOGI(TAG, "UART TEST: RIGHT (+40, -40)");
+                ESP_LOGI(TAG, "UART TEST: RIGHT (+60, -60)");
             }
             break;
 
         case TEST_RIGHT:
-            if (elapsed_us >= 1000000) {
+            if (elapsed_us >= 1500000) {
                 state = TEST_STOP_AFTER;
                 state_start_us = now_us;
                 elapsed_us = 0;
@@ -308,13 +308,13 @@ static void robot_uart_test(void)
 
     switch (state) {
         case TEST_LEFT:
-            left = -40;
-            right = 40;
+            left = -60;
+            right = 60;
             break;
 
         case TEST_RIGHT:
-            left = 40;
-            right = -40;
+            left = 60;
+            right = -60;
             break;
 
         case TEST_STOP_BEFORE:
@@ -338,13 +338,19 @@ void camera_init(void)
     CAM_RST(1);
     vTaskDelay(pdMS_TO_TICKS(20));
 
+    /*
+     * 电机串口必须独立于摄像头初始化。
+     * 即使摄像头初始化失败，也必须能够向 STM32 发送控制帧，
+     * 否则电机测试会被摄像头故障连带阻断。
+     */
+    robot_uart_init();
+
     esp_err_t ret = esp_camera_init(&camera_config);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Camera init failed: 0x%x", ret);
+        ESP_LOGW(TAG, "Robot UART remains available for motor test");
         return;
     }
-
-    robot_uart_init();
 
     sensor_t *sensor = esp_camera_sensor_get();
     if (sensor != NULL) {
@@ -355,6 +361,12 @@ void camera_init(void)
 
 void camera_show(uint16_t x, uint16_t y)
 {
+    /*
+     * 电机串口测试放在取摄像头帧之前。
+     * 这样即使摄像头取帧失败，也不会阻止 ESP32 -> STM32 控制链路。
+     */
+    robot_uart_test();
+
     camera_fb_t *fb = esp_camera_fb_get();
     if (fb == NULL) {
         ESP_LOGW(TAG, "Camera frame capture failed");
@@ -371,12 +383,6 @@ void camera_show(uint16_t x, uint16_t y)
         esp_camera_fb_return(fb);
         return;
     }
-
-    /*
-     * 第一阶段串口测试：暂时完全脱离 YOLO，
-     * 只验证 ESP32 -> STM32 的左右转指令。
-     */
-    robot_uart_test();
 
     if (!video_stream_pc_video_active()) {
         lcd_lock();
