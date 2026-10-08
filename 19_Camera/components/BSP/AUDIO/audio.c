@@ -18,7 +18,8 @@ static const char *TAG = "audio";
 #define AUDIO_I2C_SCL        GPIO_NUM_13
 #define AUDIO_ES8388_ADDR    0x10
 
-#define AUDIO_I2S_PORT       I2S_NUM_0
+#define AUDIO_I2S_TX_PORT    I2S_NUM_0
+#define AUDIO_I2S_RX_PORT    I2S_NUM_1
 #define AUDIO_MCLK           GPIO_NUM_0
 #define AUDIO_BCLK           GPIO_NUM_14
 #define AUDIO_LRCK           GPIO_NUM_19
@@ -221,8 +222,19 @@ static esp_err_t es8388_init(void)
 
 static esp_err_t audio_i2s_init(void)
 {
-    i2s_config_t cfg = {
-        .mode = I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX,
+    /*
+     * Split TX/RX across the two S3 I2S controllers.
+     *
+     * I2S0 is the master and generates MCLK/BCLK/LRCK for ES8388 and
+     * handles speaker playback. I2S1 is a slave RX-only receiver that
+     * listens to the same BCLK/LRCK and captures ES8388 ASDOUT on GPIO20.
+     *
+     * This deliberately avoids legacy full-duplex I2S0 RX/TX sharing one
+     * DMA/clock state, which is the remaining suspect after the codec and
+     * UDP paths were verified.
+     */
+    i2s_config_t tx_cfg = {
+        .mode = I2S_MODE_MASTER | I2S_MODE_TX,
         .sample_rate = AUDIO_SAMPLE_RATE,
         .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
@@ -235,27 +247,67 @@ static esp_err_t audio_i2s_init(void)
         .fixed_mclk = 0,
     };
 
-    i2s_pin_config_t pins = {
+    i2s_pin_config_t tx_pins = {
         .mck_io_num = AUDIO_MCLK,
         .bck_io_num = AUDIO_BCLK,
         .ws_io_num = AUDIO_LRCK,
         .data_out_num = AUDIO_DOUT,
-        .data_in_num = AUDIO_DIN,
+        .data_in_num = I2S_PIN_NO_CHANGE,
     };
 
-    esp_err_t ret = i2s_driver_install(AUDIO_I2S_PORT, &cfg, 0, NULL);
+    esp_err_t ret = i2s_driver_install(AUDIO_I2S_TX_PORT, &tx_cfg, 0, NULL);
     if (ret != ESP_OK) return ret;
 
-    ret = i2s_set_pin(AUDIO_I2S_PORT, &pins);
+    ret = i2s_set_pin(AUDIO_I2S_TX_PORT, &tx_pins);
     if (ret != ESP_OK) {
-        i2s_driver_uninstall(AUDIO_I2S_PORT);
+        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
         return ret;
     }
 
-    ret = i2s_zero_dma_buffer(AUDIO_I2S_PORT);
+    i2s_config_t rx_cfg = {
+        .mode = I2S_MODE_SLAVE | I2S_MODE_RX,
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+        .dma_buf_count = 6,
+        .dma_buf_len = 256,
+        .use_apll = false,
+        .tx_desc_auto_clear = false,
+        .fixed_mclk = 0,
+    };
+
+    i2s_pin_config_t rx_pins = {
+        .mck_io_num = I2S_PIN_NO_CHANGE,
+        .bck_io_num = AUDIO_BCLK,
+        .ws_io_num = AUDIO_LRCK,
+        .data_out_num = I2S_PIN_NO_CHANGE,
+        .data_in_num = AUDIO_DIN,
+    };
+
+    ret = i2s_driver_install(AUDIO_I2S_RX_PORT, &rx_cfg, 0, NULL);
+    if (ret != ESP_OK) {
+        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
+        return ret;
+    }
+
+    ret = i2s_set_pin(AUDIO_I2S_RX_PORT, &rx_pins);
+    if (ret != ESP_OK) {
+        i2s_driver_uninstall(AUDIO_I2S_RX_PORT);
+        i2s_driver_uninstall(AUDIO_I2S_TX_PORT);
+        return ret;
+    }
+
+    ret = i2s_zero_dma_buffer(AUDIO_I2S_TX_PORT);
     if (ret != ESP_OK) return ret;
 
-    ESP_LOGI(TAG, "I2S pins: MCLK=%d BCLK=%d LRCK=%d DOUT=%d DIN=%d",
+    ret = i2s_zero_dma_buffer(AUDIO_I2S_RX_PORT);
+    if (ret != ESP_OK) return ret;
+
+    ESP_LOGI(TAG,
+             "I2S split mode: TX=I2S0 master, RX=I2S1 slave; "
+             "MCLK=%d BCLK=%d LRCK=%d DOUT=%d DIN=%d",
              AUDIO_MCLK, AUDIO_BCLK, AUDIO_LRCK, AUDIO_DOUT, AUDIO_DIN);
     return ESP_OK;
 }
@@ -316,7 +368,7 @@ static void audio_rx_task(void *arg)
             s_rx_sum_abs = sum_abs / (AUDIO_FRAME_BYTES / sizeof(int16_t));
 
             size_t written = 0;
-            i2s_write(AUDIO_I2S_PORT, buffer, AUDIO_FRAME_BYTES,
+            i2s_write(AUDIO_I2S_TX_PORT, buffer, AUDIO_FRAME_BYTES,
                       &written, pdMS_TO_TICKS(30));
         }
     }
@@ -351,7 +403,7 @@ static void audio_tx_task(void *arg)
 
     while (true) {
         size_t read_bytes = 0;
-        esp_err_t ret = i2s_read(AUDIO_I2S_PORT, buffer, sizeof(buffer),
+        esp_err_t ret = i2s_read(AUDIO_I2S_RX_PORT, buffer, sizeof(buffer),
                                  &read_bytes, portMAX_DELAY);
         if (ret != ESP_OK || read_bytes != sizeof(buffer)) continue;
 
