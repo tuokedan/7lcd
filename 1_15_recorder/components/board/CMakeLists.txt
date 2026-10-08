@@ -1,0 +1,4 @@
+set(COMPONENT_ADD_INCLUDEDIRS .)
+set(COMPONENT_PRIV_INCLUDEDIRS ".")
+
+register_component()
