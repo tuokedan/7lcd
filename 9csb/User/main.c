@@ -100,11 +100,8 @@ int main(void)
 	Servo_SetAngle(90);
 	robot_set_signed_speed(0,0);
 
-	Serial_Printf("
-ESP32 person-follow controller ready
-");
-	Serial_Printf("USART1 PA9/PA10 115200 8N1
-");
+	Serial_Printf("\r\nESP32 person-follow controller ready\r\n");
+	Serial_Printf("USART1 PA9/PA10 115200 8N1\r\n");
 
 	while(1)
 	{
