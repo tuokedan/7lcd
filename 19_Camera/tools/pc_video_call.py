@@ -42,6 +42,8 @@ WIDTH = 320
 HEIGHT = 240
 JPEG_QUALITY = 55
 TARGET_FPS = 8
+DISPLAY_WIDTH = WIDTH * 2
+DISPLAY_HEIGHT = HEIGHT * 2
 
 state_lock = threading.Lock()
 latest_pc_frame = None
@@ -273,15 +275,16 @@ def audio_receive_thread():
 
 
 def add_label(image, text):
-    cv2.rectangle(image, (0, 0), (WIDTH, 30), (0, 0, 0), -1)
+    label_height = 60
+    cv2.rectangle(image, (0, 0), (image.shape[1], label_height), (0, 0, 0), -1)
     cv2.putText(
         image,
         text,
-        (8, 21),
+        (16, 42),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.52,
+        1.0,
         (0, 255, 0),
-        1,
+        2,
         cv2.LINE_AA,
     )
     return image
@@ -327,12 +330,22 @@ def main():
             if esp is None:
                 esp = blank.copy()
 
-            left = add_label(pc, f"PC Camera -> ESP32 LCD  {tx_fps:.1f} FPS")
-            right = add_label(esp, f"ESP32 Camera -> PC  {rx_fps:.1f} FPS")
-            cv2.putText(left, f"Audio TX {atx_fps:.1f} fps", (8, HEIGHT - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1, cv2.LINE_AA)
-            cv2.putText(right, f"Audio RX {arx_fps:.1f} fps", (8, HEIGHT - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1, cv2.LINE_AA)
+            left = cv2.resize(pc, (DISPLAY_WIDTH, DISPLAY_HEIGHT), interpolation=cv2.INTER_NEAREST)
+            right = cv2.resize(esp, (DISPLAY_WIDTH, DISPLAY_HEIGHT), interpolation=cv2.INTER_NEAREST)
+
+            left = add_label(left, f"PC Camera -> ESP32 LCD  {tx_fps:.1f} FPS")
+            right = add_label(right, f"ESP32 Camera -> PC  {rx_fps:.1f} FPS")
+
+            cv2.putText(left, f"Audio TX {atx_fps:.1f} fps",
+                        (16, DISPLAY_HEIGHT - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(right, f"Audio RX {arx_fps:.1f} fps",
+                        (16, DISPLAY_HEIGHT - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2, cv2.LINE_AA)
 
             combined = np.hstack((left, right))
+            cv2.namedWindow("ESP32 Bidirectional Video", cv2.WINDOW_NORMAL)
+            cv2.resizeWindow("ESP32 Bidirectional Video", DISPLAY_WIDTH * 2, DISPLAY_HEIGHT)
             cv2.imshow("ESP32 Bidirectional Video", combined)
 
             key = cv2.waitKey(20) & 0xFF
