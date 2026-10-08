@@ -199,8 +199,12 @@ static esp_err_t es8388_init(void)
     es8388_log_reg(ES8388_ADCCONTROL13, "ADCCONTROL13");
     es8388_log_reg(ES8388_ADCCONTROL14, "ADCCONTROL14");
 
-    /* ADC must be fully powered for microphone capture. */
-    es8388_write_reg(ES8388_ADCPOWER, 0x00);
+    /* Match the proven board recorder: ADCPOWER final = 0x09. */
+    esp_err_t adc_power_ret = es8388_write_reg(ES8388_ADCPOWER, 0x09);
+    if (adc_power_ret != ESP_OK) {
+        ESP_LOGE(TAG, "ES8388 ADCPOWER final write failed: %s", esp_err_to_name(adc_power_ret));
+        return adc_power_ret;
+    }
     es8388_log_reg(ES8388_ADCPOWER, "ADCPOWER(final)");
 
     ESP_LOGI(TAG, "ES8388 initialized: 16 kHz / 16-bit / stereo / I2S slave");
