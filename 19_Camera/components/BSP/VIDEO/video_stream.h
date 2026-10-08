@@ -11,6 +11,9 @@ extern "C" {
 /* Start the ESP32 Wi-Fi AP and the HTTP MJPEG video server. */
 void video_stream_init(void);
 
+/* Start Wi-Fi AP only, without HTTP/video buffers or video processing. */
+void video_stream_init_wifi_only(void);
+
 /*
  * Publish the current camera frame for the PC receiver.
  * The function is non-blocking with respect to the HTTP client.
