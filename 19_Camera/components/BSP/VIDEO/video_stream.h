@@ -17,6 +17,9 @@ void video_stream_init(void);
  */
 void video_stream_publish_frame(const camera_fb_t *fb);
 
+/* Return true while recent PC reverse-video frames are arriving. */
+bool video_stream_pc_video_active(void);
+
 #ifdef __cplusplus
 }
 #endif
