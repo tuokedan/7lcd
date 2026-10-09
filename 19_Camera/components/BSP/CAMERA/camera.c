@@ -16,19 +16,19 @@ static const char *TAG = "camera";
 
 /*
  * ESP32-S3 -> STM32F103C8T6
- * UART1 TX = GPIO37 (temporary test choice requested by user)
+ * UART1 TX = GPIO38 (temporary test choice requested by user)
  * 115200 8N1
  *
  * 当前只使用 TX：
- *   ESP32 GPIO37 -> STM32 PA10 (USART1_RX)
+ *   ESP32 GPIO38 -> STM32 PA10 (USART1_RX)
  *   GND          -> GND
  *
- * WARNING: GPIO37 may be used by Octal PSRAM on some ESP32-S3 modules.
- * Verify the exact module pinout and confirm the board boots/PSRAM works
- * before relying on this pin. If boot or PSRAM becomes unstable, revert this pin.
+ * GPIO38 is selected to avoid GPIO35-37, which may be connected to Octal PSRAM.
+ * Note: the board schematic assigns GPIO38 to the SD-card interface (SD_CMD).
+ * This UART test assumes the SD-card interface is not active.
  */
 #define ROBOT_UART       UART_NUM_1
-#define ROBOT_UART_TX    GPIO_NUM_37
+#define ROBOT_UART_TX    GPIO_NUM_38
 #define ROBOT_UART_BAUD  115200
 
 static bool s_robot_uart_ready = false;
@@ -165,8 +165,8 @@ static void robot_uart_init(void)
 
     s_robot_uart_ready = true;
     ESP_LOGI(TAG,
-             "Robot UART ready: TX GPIO37 -> STM32 PA10, 115200 8N1");
-    ESP_LOGW(TAG, "GPIO37 may conflict with Octal PSRAM on some ESP32-S3 modules");
+             "Robot UART ready: TX GPIO38 -> STM32 PA10, 115200 8N1");
+    ESP_LOGW(TAG, "UART TX uses GPIO38; SD-card interface must remain unused during this test");
 }
 
 /*
