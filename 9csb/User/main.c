@@ -154,7 +154,7 @@ int main(void)
 			{
 				stop_reason = 2; /* 超声波触发避障 */
 			}
-			Serial_Printf("DBG rx=%lu L=%d R=%d age=%u dist_x10=%d stop=%u\\r\\n",
+			Serial_Printf("DBG rx=%lu L=%d R=%d age=%u dist_x10=%d stop=%u\r\n",
 			              (unsigned long)g_valid_frame_count,
 			              (int)g_left_speed, (int)g_right_speed,
 			              (unsigned int)g_control_age_ms,
