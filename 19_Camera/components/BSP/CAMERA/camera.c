@@ -204,8 +204,10 @@ static void robot_send_speed(int8_t left, int8_t right)
  * 每 100ms 重发一次，确保 STM32 的 700ms 通信超时保护不会触发。
  * 测试完成后保持 STOP，不再自动动作。
  */
-static void robot_uart_test(void)
+static void robot_uart_test_task(void *arg)
 {
+    (void)arg;
+
     enum {
         TEST_STOP_BEFORE = 0,
         TEST_LEFT,
@@ -215,121 +217,83 @@ static void robot_uart_test(void)
         TEST_DONE
     };
 
-    static int state = TEST_STOP_BEFORE;
-    static int64_t state_start_us = 0;
-    static int64_t last_send_us = 0;
-    static bool initialized = false;
+    int state = TEST_STOP_BEFORE;
+    int64_t state_start_us = esp_timer_get_time();
+    int64_t last_log_us = 0;
 
-    static const char *state_name[] = {
-        "STOP",
-        "LEFT",
-        "STOP",
-        "RIGHT",
-        "STOP",
-        "DONE"
-    };
+    ESP_LOGI(TAG, "=== ROBOT UART TEST TASK START ===");
+    ESP_LOGI(TAG, "STOP 1.0s -> LEFT 1.5s -> STOP 1.0s -> RIGHT 1.5s -> STOP");
 
-    const int64_t now_us = esp_timer_get_time();
+    while (1) {
+        const int64_t now_us = esp_timer_get_time();
+        const int64_t elapsed_us = now_us - state_start_us;
 
-    if (!initialized) {
-        initialized = true;
-        state_start_us = now_us;
-        last_send_us = 0;
-        ESP_LOGI(TAG, "=== ROBOT UART TEST START ===");
-        ESP_LOGI(TAG, "STOP 1.0s -> LEFT 1.5s -> STOP 1.0s -> RIGHT 1.5s -> STOP");
-    }
-
-    int64_t elapsed_us = now_us - state_start_us;
-
-    switch (state) {
-        case TEST_STOP_BEFORE:
-            if (elapsed_us >= 1000000) {
-                state = TEST_LEFT;
-                state_start_us = now_us;
-                elapsed_us = 0;
-                ESP_LOGI(TAG, "UART TEST: LEFT (-60, +60)");
-            }
-            break;
-
-        case TEST_LEFT:
-            if (elapsed_us >= 1500000) {
-                state = TEST_STOP_MIDDLE;
-                state_start_us = now_us;
-                elapsed_us = 0;
-                ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
-            }
-            break;
-
-        case TEST_STOP_MIDDLE:
-            if (elapsed_us >= 1000000) {
-                state = TEST_RIGHT;
-                state_start_us = now_us;
-                elapsed_us = 0;
-                ESP_LOGI(TAG, "UART TEST: RIGHT (+60, -60)");
-            }
-            break;
-
-        case TEST_RIGHT:
-            if (elapsed_us >= 1500000) {
-                state = TEST_STOP_AFTER;
-                state_start_us = now_us;
-                elapsed_us = 0;
-                ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
-            }
-            break;
-
-        case TEST_STOP_AFTER:
-            if (elapsed_us >= 1500000) {
-                state = TEST_DONE;
-                state_start_us = now_us;
-                ESP_LOGI(TAG, "=== ROBOT UART TEST DONE ===");
-            }
-            break;
-
-        case TEST_DONE:
-        default:
-            break;
-    }
-
-    if (state == TEST_DONE) {
-        if (now_us - last_send_us >= 100000) {
-            robot_send_speed(0, 0);
-            last_send_us = now_us;
+        switch (state) {
+            case TEST_STOP_BEFORE:
+                if (elapsed_us >= 1000000) {
+                    state = TEST_LEFT;
+                    state_start_us = now_us;
+                    ESP_LOGI(TAG, "UART TEST: LEFT (-60, +60)");
+                }
+                break;
+            case TEST_LEFT:
+                if (elapsed_us >= 1500000) {
+                    state = TEST_STOP_MIDDLE;
+                    state_start_us = now_us;
+                    ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
+                }
+                break;
+            case TEST_STOP_MIDDLE:
+                if (elapsed_us >= 1000000) {
+                    state = TEST_RIGHT;
+                    state_start_us = now_us;
+                    ESP_LOGI(TAG, "UART TEST: RIGHT (+60, -60)");
+                }
+                break;
+            case TEST_RIGHT:
+                if (elapsed_us >= 1500000) {
+                    state = TEST_STOP_AFTER;
+                    state_start_us = now_us;
+                    ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
+                }
+                break;
+            case TEST_STOP_AFTER:
+                if (elapsed_us >= 1000000) {
+                    state = TEST_DONE;
+                    state_start_us = now_us;
+                    ESP_LOGI(TAG, "=== ROBOT UART TEST DONE; KEEP STOP ===");
+                }
+                break;
+            case TEST_DONE:
+            default:
+                break;
         }
-        return;
-    }
 
-    if (now_us - last_send_us < 100000) {
-        return;
-    }
-
-    int8_t left = 0;
-    int8_t right = 0;
-
-    switch (state) {
-        case TEST_LEFT:
+        int8_t left = 0;
+        int8_t right = 0;
+        if (state == TEST_LEFT) {
             left = -60;
             right = 60;
-            break;
-
-        case TEST_RIGHT:
+        } else if (state == TEST_RIGHT) {
             left = 60;
             right = -60;
-            break;
+        }
 
-        case TEST_STOP_BEFORE:
-        case TEST_STOP_MIDDLE:
-        case TEST_STOP_AFTER:
-        default:
-            left = 0;
-            right = 0;
-            break;
+        /*
+         * UART test runs in its own task, independent of camera capture/LCD/video.
+         * Repeated 100ms frames keep the STM32 communication watchdog refreshed.
+         */
+        robot_send_speed(left, right);
+
+        if (state != TEST_DONE && now_us - last_log_us >= 1000000) {
+            ESP_LOGI(TAG, "UART frame heartbeat: state=%d left=%d right=%d",
+                     state, (int)left, (int)right);
+            last_log_us = now_us;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
-
-    robot_send_speed(left, right);
-    last_send_us = now_us;
 }
-
 
 void camera_init(void)
 {
@@ -344,6 +308,20 @@ void camera_init(void)
      * 否则电机测试会被摄像头故障连带阻断。
      */
     robot_uart_init();
+    if (s_robot_uart_ready) {
+        BaseType_t task_ok = xTaskCreate(
+            robot_uart_test_task,
+            "robot_uart_test",
+            3072,
+            NULL,
+            5,
+            NULL);
+        if (task_ok != pdPASS) {
+            ESP_LOGE(TAG, "Failed to create robot UART test task");
+        }
+    } else {
+        ESP_LOGE(TAG, "Robot UART unavailable; motor test task not started");
+    }
 
     esp_err_t ret = esp_camera_init(&camera_config);
     if (ret != ESP_OK) {
@@ -361,16 +339,9 @@ void camera_init(void)
 
 void camera_show(uint16_t x, uint16_t y)
 {
-    /*
-     * 电机串口测试放在取摄像头帧之前。
-     * 这样即使摄像头取帧失败，也不会阻止 ESP32 -> STM32 控制链路。
-     */
-    robot_uart_test();
-
     camera_fb_t *fb = esp_camera_fb_get();
     if (fb == NULL) {
         ESP_LOGW(TAG, "Camera frame capture failed");
-        robot_send_speed(0, 0);
         return;
     }
 
@@ -379,7 +350,6 @@ void camera_show(uint16_t x, uint16_t y)
         y + fb->height > LCD_HEIGHT) {
         ESP_LOGW(TAG, "Unsupported frame: %ux%u format=%d",
                  fb->width, fb->height, fb->format);
-        robot_send_speed(0, 0);
         esp_camera_fb_return(fb);
         return;
     }
