@@ -196,18 +196,11 @@ static void robot_send_speed(int8_t left, int8_t right)
 }
 
 /*
-/*
  * 人体跟随任务：
  * - 每 100ms 发送一帧，持续刷新 STM32 通信看门狗。
- * - 未检测到有效人体时停车。
- * - 根据人体框中心控制左右轮差速；人体框高度仅作为粗略距离指标。
- * - 人体过近时停车，重新拉开距离后再跟随。
- */
-/*
- * 人体跟随任务：
- * - 根据人体框中心进行差速转向。
- * - 使用修正后的框高度仅判断是否过近，不用框高度调节前进速度。
- * - 检测结果无效/过期时停车。
+ * - 检测到有效人体时以固定基础速度前进，并根据人体框中心差速转向。
+ * - 检测结果无效或过期时停车。
+ * - 不使用人体框高度作为停车条件或速度控制依据。
  */
 static void robot_follow_task(void *arg)
 {
@@ -216,7 +209,6 @@ static void robot_follow_task(void *arg)
     const int image_center_x = YOLO_CAMERA_WIDTH / 2;
     const int deadband_px = 22;
     const float confidence_min = 0.45f;
-    bool target_too_close = false;
     int64_t last_follow_log_us = 0;
 
     ESP_LOGI(TAG, "Person-follow task started; no valid detection means STOP");
@@ -231,47 +223,41 @@ static void robot_follow_task(void *arg)
             detection.confidence >= confidence_min &&
             detection.class_id == YOLO_PERSON_CLASS) {
             const float center_x = (detection.x1 + detection.x2) * 0.5f;
-            const float box_height = detection.y2 - detection.y1;
             const float error_x = center_x - (float)image_center_x;
 
             target_valid = true;
 
-            /* 不再根据人体框高度判断停车；框高度不参与速度控制。 */
-            target_too_close = false;
+            const int base_speed = 25;
+            int steer = 0;
 
-            if (!target_too_close) {
-                const int base_speed = 25;
-                int steer = 0;
-
-                if (error_x > (float)deadband_px) {
-                    steer = (int)((error_x - deadband_px) * 0.30f);
-                } else if (error_x < -(float)deadband_px) {
-                    steer = (int)((error_x + deadband_px) * 0.30f);
-                }
-
-                if (steer > 18) steer = 18;
-                if (steer < -18) steer = -18;
-
-                left = base_speed + steer;
-                right = base_speed - steer;
-
-                if (left > 40) left = 40;
-                if (right > 40) right = 40;
-                if (left < 0) left = 0;
-                if (right < 0) right = 0;
+            if (error_x > (float)deadband_px) {
+                steer = (int)((error_x - deadband_px) * 0.30f);
+            } else if (error_x < -(float)deadband_px) {
+                steer = (int)((error_x + deadband_px) * 0.30f);
             }
+
+            if (steer > 18) steer = 18;
+            if (steer < -18) steer = -18;
+
+            left = base_speed + steer;
+            right = base_speed - steer;
+
+            if (left > 40) left = 40;
+            if (right > 40) right = 40;
+            if (left < 0) left = 0;
+            if (right < 0) right = 0;
         }
 
         const int64_t now_us = esp_timer_get_time();
         if (now_us - last_follow_log_us >= 1000000) {
             if (target_valid) {
                 ESP_LOGI(TAG,
-                         "FOLLOW conf=%.2f center_x=%.0f box=(%.0f,%.0f)-(%.0f,%.0f) L=%d R=%d close=%d",
+                         "FOLLOW conf=%.2f center_x=%.0f box=(%.0f,%.0f)-(%.0f,%.0f) L=%d R=%d",
                          detection.confidence,
                          (detection.x1 + detection.x2) * 0.5f,
                          detection.x1, detection.y1,
                          detection.x2, detection.y2,
-                         left, right, target_too_close ? 1 : 0);
+                         left, right);
             } else {
                 ESP_LOGI(TAG, "FOLLOW no fresh person detection; STOP");
             }
