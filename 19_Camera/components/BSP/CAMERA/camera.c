@@ -216,8 +216,6 @@ static void robot_follow_task(void *arg)
     const int image_center_x = YOLO_CAMERA_WIDTH / 2;
     const int deadband_px = 22;
     const float confidence_min = 0.45f;
-    const float too_close_height_px = 155.0f;
-    const float resume_height_px = 125.0f;
     bool target_too_close = false;
     int64_t last_follow_log_us = 0;
 
@@ -238,14 +236,8 @@ static void robot_follow_task(void *arg)
 
             target_valid = true;
 
-            /* 框高度只用于近距离停车/恢复判断，不参与速度调节。 */
-            if (target_too_close) {
-                if (box_height < resume_height_px) {
-                    target_too_close = false;
-                }
-            } else if (box_height >= too_close_height_px) {
-                target_too_close = true;
-            }
+            /* 不再根据人体框高度判断停车；框高度不参与速度控制。 */
+            target_too_close = false;
 
             if (!target_too_close) {
                 const int base_speed = 25;
