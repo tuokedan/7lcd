@@ -311,37 +311,37 @@ void camera_init(void)
     vTaskDelay(pdMS_TO_TICKS(20));
 
     /*
-     * 电机串口必须独立于摄像头初始化。
-     * 即使摄像头初始化失败，也必须能够向 STM32 发送控制帧，
-     * 否则电机测试会被摄像头故障连带阻断。
+     * 先完成摄像头驱动初始化，再启动电机串口测试任务。
+     * 避免 UART 测试任务在 esp_camera_init() 的关键初始化阶段抢占 CPU。
+     * 串口测试任务使用较低优先级，不应影响摄像头/音视频初始化。
      */
     robot_uart_init();
+
+    esp_err_t ret = esp_camera_init(&camera_config);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Camera init failed: 0x%x", ret);
+        ESP_LOGW(TAG, "Continuing with UART test even though camera init failed");
+    } else {
+        sensor_t *sensor = esp_camera_sensor_get();
+        if (sensor != NULL) {
+            ESP_LOGI(TAG, "Camera sensor initialized");
+            ESP_LOGI(TAG, "Frame size: 320x240, format: RGB565");
+        }
+    }
+
     if (s_robot_uart_ready) {
         BaseType_t task_ok = xTaskCreate(
             robot_uart_test_task,
             "robot_uart_test",
             3072,
             NULL,
-            5,
+            2,
             NULL);
         if (task_ok != pdPASS) {
             ESP_LOGE(TAG, "Failed to create robot UART test task");
         }
     } else {
         ESP_LOGE(TAG, "Robot UART unavailable; motor test task not started");
-    }
-
-    esp_err_t ret = esp_camera_init(&camera_config);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Camera init failed: 0x%x", ret);
-        ESP_LOGW(TAG, "Robot UART remains available for motor test");
-        return;
-    }
-
-    sensor_t *sensor = esp_camera_sensor_get();
-    if (sensor != NULL) {
-        ESP_LOGI(TAG, "Camera sensor initialized");
-        ESP_LOGI(TAG, "Frame size: 320x240, format: RGB565");
     }
 }
 
