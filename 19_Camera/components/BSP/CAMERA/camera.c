@@ -23,13 +23,16 @@ static const char *TAG = "camera";
  *   ESP32 GPIO1 -> STM32 PA10 (USART1_RX)
  *   GND         -> GND
  *
- * GPIO1 未被当前摄像头、LCD、音频代码配置使用；使用前仍需确认具体模组没有将其分配给内部存储。
+ * GPIO1 同时作为开发板 ADC/功能按键引脚使用。本测试暂时复用为 UART TX：
+ * 测试期间不要按该按键，也不要让其他代码配置/读取 GPIO1。
+ * 若按键电路会在按下时把 GPIO1 拉高/拉低，按键可能干扰串口输出。
  */
 #define ROBOT_UART       UART_NUM_1
 #define ROBOT_UART_TX    GPIO_NUM_1
 #define ROBOT_UART_BAUD  115200
 
 static bool s_robot_uart_ready = false;
+static bool s_uart_write_error_logged = false;
 
 static camera_config_t camera_config = {
     .pin_pwdn = CAM_PIN_PWDN,
@@ -162,7 +165,8 @@ static void robot_uart_init(void)
 
     s_robot_uart_ready = true;
     ESP_LOGI(TAG,
-             "Robot UART ready: TX GPIO1 -> STM32 PA10, 115200 8N1");
+             "Robot UART ready: TX GPIO1 (shared ADC/button pin) -> STM32 PA10, 115200 8N1");
+    ESP_LOGW(TAG, "UART test: do NOT press the GPIO1 button during motor testing");
 }
 
 /*
@@ -183,7 +187,12 @@ static void robot_send_speed(int8_t left, int8_t right)
     packet[3] = (uint8_t)right;
     packet[4] = (uint8_t)(packet[0] ^ packet[1] ^ packet[2] ^ packet[3]);
 
-    (void)uart_write_bytes(ROBOT_UART, packet, sizeof(packet));
+    int written = uart_write_bytes(ROBOT_UART, (const char *)packet, sizeof(packet));
+    if (written != (int)sizeof(packet) && !s_uart_write_error_logged) {
+        ESP_LOGE(TAG, "UART TX write failed/short: %d of %u bytes",
+                 written, (unsigned)sizeof(packet));
+        s_uart_write_error_logged = true;
+    }
 }
 
 /*
