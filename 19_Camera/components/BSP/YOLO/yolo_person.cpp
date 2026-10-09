@@ -407,26 +407,28 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
         }
 
         /*
-         * 模型坐标系是 224x224 letterbox：
-         *   x: 无水平 padding
-         *   y: 上下各 28 px padding
-         *   scale = 224 / 320 = 0.7
-         *
-         * 反算回摄像头原始 320x240 坐标。
+         * ESP-DL 的 dl::detect::result_t::box 格式为：
+         * [left_up_x, left_up_y, right_down_x, right_down_y]，
+         * 即 [x1, y1, x2, y2]，不是 [x, y, width, height]。
+         * 先按 xyxy 读取，再去掉 224x224 letterbox 上下各 28 px
+         * 的 padding，最后映射回摄像头 320x240 原图坐标。
          */
         constexpr float scale = 224.0f / 320.0f;
         constexpr float pad_x = 0.0f;
         constexpr float pad_y = 28.0f;
 
-        /*
-         * ESP-DL result_t::box 使用 [x, y, width, height]，
-         * 不是 [x1, y1, x2, y2]。先在模型坐标系计算右下角，
-         * 再去除 letterbox padding 并反算到 320x240 原图坐标。
-         */
         const float model_x1 = static_cast<float>(result.box[0]);
         const float model_y1 = static_cast<float>(result.box[1]);
-        const float model_x2 = model_x1 + static_cast<float>(result.box[2]);
-        const float model_y2 = model_y1 + static_cast<float>(result.box[3]);
+        const float model_x2 = static_cast<float>(result.box[2]);
+        const float model_y2 = static_cast<float>(result.box[3]);
+
+        /* 排除模型输出中坐标顺序异常或退化的框。 */
+        if (model_x2 <= model_x1 || model_y2 <= model_y1) {
+            ESP_LOGW(TAG, "Reject invalid raw box=[%d,%d,%d,%d] score=%.2f",
+                     result.box[0], result.box[1],
+                     result.box[2], result.box[3], result.score);
+            continue;
+        }
 
         float x1 = (model_x1 - pad_x) / scale;
         float y1 = (model_y1 - pad_y) / scale;
@@ -437,6 +439,32 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
         if (y1 < 0.0f) y1 = 0.0f;
         if (x2 > width - 1) x2 = width - 1;
         if (y2 > height - 1) y2 = height - 1;
+
+        const float box_w = x2 - x1;
+        const float box_h = y2 - y1;
+        const float box_area = box_w * box_h;
+        const float image_area = static_cast<float>(width) * height;
+
+        /*
+         * 当前日志里的整屏框属于异常框，不能拿它计算转向中心。
+         * 过滤几乎覆盖全宽、全高或面积超过画面 75% 的框。
+         */
+        if (box_w <= 1.0f || box_h <= 1.0f ||
+            box_w >= width * 0.95f ||
+            box_h >= height * 0.95f ||
+            box_area >= image_area * 0.75f) {
+            ESP_LOGW(TAG,
+                     "Reject oversized box raw=[%d,%d,%d,%d] mapped=(%.0f,%.0f)-(%.0f,%.0f) score=%.2f",
+                     result.box[0], result.box[1],
+                     result.box[2], result.box[3],
+                     x1, y1, x2, y2, result.score);
+            continue;
+        }
+
+        ESP_LOGI(TAG, "Raw box=[%d,%d,%d,%d] -> mapped=(%.0f,%.0f)-(%.0f,%.0f) score=%.2f",
+                 result.box[0], result.box[1],
+                 result.box[2], result.box[3],
+                 x1, y1, x2, y2, result.score);
 
         detection->x1 = x1;
         detection->y1 = y1;
