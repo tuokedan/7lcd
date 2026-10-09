@@ -196,28 +196,18 @@ static void robot_send_speed(int8_t left, int8_t right)
 }
 
 /*
- * 第一阶段仅测试 ESP32 -> STM32 串口和左右转向。
- *
- * 不使用 YOLO 结果，不做距离/速度控制。
- * 上电后依次：
- *   STOP 1.0s
- *   LEFT 1.5s
- *   STOP 1.0s
- *   RIGHT 1.5s
- *   STOP 1.0s
- *
- * LEFT  = 左轮 -40，右轮 +40
- * RIGHT = 左轮 +40，右轮 -40
- *
- * 每 100ms 重发一次，确保 STM32 的 700ms 通信超时保护不会触发。
- * 测试完成后保持 STOP，不再自动动作。
- */
 /*
  * 人体跟随任务：
  * - 每 100ms 发送一帧，持续刷新 STM32 通信看门狗。
  * - 未检测到有效人体时停车。
  * - 根据人体框中心控制左右轮差速；人体框高度仅作为粗略距离指标。
  * - 人体过近时停车，重新拉开距离后再跟随。
+ */
+/*
+ * 人体跟随任务：
+ * - 根据人体框中心进行差速转向。
+ * - 使用修正后的框高度仅判断是否过近，不用框高度调节前进速度。
+ * - 检测结果无效/过期时停车。
  */
 static void robot_follow_task(void *arg)
 {
@@ -226,10 +216,12 @@ static void robot_follow_task(void *arg)
     const int image_center_x = YOLO_CAMERA_WIDTH / 2;
     const int deadband_px = 22;
     const float confidence_min = 0.45f;
+    const float too_close_height_px = 155.0f;
+    const float resume_height_px = 125.0f;
     bool target_too_close = false;
     int64_t last_follow_log_us = 0;
 
-    ESP_LOGI(TAG, "Person-follow task started; no target means STOP");
+    ESP_LOGI(TAG, "Person-follow task started; no valid detection means STOP");
 
     while (1) {
         yolo_detection_t detection = {};
@@ -240,45 +232,39 @@ static void robot_follow_task(void *arg)
         if (yolo_person_get_latest_detection(&detection) &&
             detection.confidence >= confidence_min &&
             detection.class_id == YOLO_PERSON_CLASS) {
-            target_valid = true;
             const float center_x = (detection.x1 + detection.x2) * 0.5f;
             const float box_height = detection.y2 - detection.y1;
             const float error_x = center_x - (float)image_center_x;
 
-            /* 简单滞回，避免人体框在阈值附近时电机频繁启停。 */
+            target_valid = true;
+
+            /* 框高度只用于近距离停车/恢复判断，不参与速度调节。 */
             if (target_too_close) {
-                if (box_height < 125.0f) {
+                if (box_height < resume_height_px) {
                     target_too_close = false;
                 }
-            } else if (box_height >= 155.0f) {
+            } else if (box_height >= too_close_height_px) {
                 target_too_close = true;
             }
 
             if (!target_too_close) {
-                int base_speed;
-                if (box_height < 65.0f) {
-                    base_speed = 30;
-                } else if (box_height < 115.0f) {
-                    base_speed = 23;
-                } else {
-                    base_speed = 14;
-                }
-
+                const int base_speed = 25;
                 int steer = 0;
+
                 if (error_x > (float)deadband_px) {
                     steer = (int)((error_x - deadband_px) * 0.30f);
                 } else if (error_x < -(float)deadband_px) {
                     steer = (int)((error_x + deadband_px) * 0.30f);
                 }
 
-                if (steer > 22) steer = 22;
-                if (steer < -22) steer = -22;
+                if (steer > 18) steer = 18;
+                if (steer < -18) steer = -18;
 
                 left = base_speed + steer;
                 right = base_speed - steer;
 
-                if (left > 45) left = 45;
-                if (right > 45) right = 45;
+                if (left > 40) left = 40;
+                if (right > 40) right = 40;
                 if (left < 0) left = 0;
                 if (right < 0) right = 0;
             }
@@ -288,10 +274,11 @@ static void robot_follow_task(void *arg)
         if (now_us - last_follow_log_us >= 1000000) {
             if (target_valid) {
                 ESP_LOGI(TAG,
-                         "FOLLOW conf=%.2f center_x=%.0f box_h=%.0f L=%d R=%d close=%d",
+                         "FOLLOW conf=%.2f center_x=%.0f box=(%.0f,%.0f)-(%.0f,%.0f) L=%d R=%d close=%d",
                          detection.confidence,
                          (detection.x1 + detection.x2) * 0.5f,
-                         detection.y2 - detection.y1,
+                         detection.x1, detection.y1,
+                         detection.x2, detection.y2,
                          left, right, target_too_close ? 1 : 0);
             } else {
                 ESP_LOGI(TAG, "FOLLOW no fresh person detection; STOP");
