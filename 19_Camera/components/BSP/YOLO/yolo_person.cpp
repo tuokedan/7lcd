@@ -418,10 +418,20 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
         constexpr float pad_x = 0.0f;
         constexpr float pad_y = 28.0f;
 
-        float x1 = (static_cast<float>(result.box[0]) - pad_x) / scale;
-        float y1 = (static_cast<float>(result.box[1]) - pad_y) / scale;
-        float x2 = (static_cast<float>(result.box[2]) - pad_x) / scale;
-        float y2 = (static_cast<float>(result.box[3]) - pad_y) / scale;
+        /*
+         * ESP-DL result_t::box 使用 [x, y, width, height]，
+         * 不是 [x1, y1, x2, y2]。先在模型坐标系计算右下角，
+         * 再去除 letterbox padding 并反算到 320x240 原图坐标。
+         */
+        const float model_x1 = static_cast<float>(result.box[0]);
+        const float model_y1 = static_cast<float>(result.box[1]);
+        const float model_x2 = model_x1 + static_cast<float>(result.box[2]);
+        const float model_y2 = model_y1 + static_cast<float>(result.box[3]);
+
+        float x1 = (model_x1 - pad_x) / scale;
+        float y1 = (model_y1 - pad_y) / scale;
+        float x2 = (model_x2 - pad_x) / scale;
+        float y2 = (model_y2 - pad_y) / scale;
 
         if (x1 < 0.0f) x1 = 0.0f;
         if (y1 < 0.0f) y1 = 0.0f;
