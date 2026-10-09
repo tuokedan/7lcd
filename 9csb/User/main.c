@@ -30,6 +30,8 @@ static int8_t g_right_speed = 0;
 static uint16_t g_control_age_ms = ESP_CONTROL_TIMEOUT_MS;
 static int g_front_distance_x10 = 0;
 static uint32_t g_valid_frame_count = 0;
+static uint16_t g_rx_beep_ms = 0;
+static uint8_t g_rx_beep_done = 0;
 
 static void parse_esp_command(void)
 {
@@ -74,6 +76,12 @@ static void parse_esp_command(void)
 					g_right_speed = (int8_t)right_byte;
 					g_control_age_ms = 0;
 					g_valid_frame_count++;
+					/* 首次收到校验正确的数据帧时，蜂鸣器响约100ms。 */
+					if(!g_rx_beep_done)
+					{
+						g_rx_beep_done = 1;
+						g_rx_beep_ms = 100;
+					}
 				}
 				state = 0;
 				break;
@@ -109,6 +117,17 @@ int main(void)
 	while(1)
 	{
 		parse_esp_command();
+
+		/* 非阻塞蜂鸣提示：不延迟主循环，避免影响串口接收和电机控制。 */
+		if(g_rx_beep_ms > 0)
+		{
+			Buzzer_ON();
+			g_rx_beep_ms--;
+		}
+		else
+		{
+			Buzzer_OFF();
+		}
 
 		/* 每 100 ms 触发一次新的前方测距。 */
 		if(tick_ms == 0)
