@@ -203,6 +203,13 @@ static void robot_send_speed(int8_t left, int8_t right)
  *   仅用于测试摄像头视野较小时的转向效果。
  * - 不使用人体框高度作为停车条件或速度控制依据。
  */
+/*
+ * 人体跟随：
+ * - 检测到有效人体：固定基础速度 + 根据人体框中心差速转向。
+ * - 没有有效检测（包括整屏异常框被过滤）：低速左右交替搜索，
+ *   不再一直直行导致摄像头始终看不到目标。
+ * - 搜索只用于短时找目标；真实视野仍由镜头视场角决定。
+ */
 static void robot_follow_task(void *arg)
 {
     (void)arg;
@@ -210,15 +217,19 @@ static void robot_follow_task(void *arg)
     const int image_center_x = YOLO_CAMERA_WIDTH / 2;
     const int deadband_px = 22;
     const float confidence_min = 0.45f;
+    const int64_t search_switch_us = 800000;
+    int64_t search_phase_start_us = esp_timer_get_time();
+    int search_direction = 1;
     int64_t last_follow_log_us = 0;
 
-    ESP_LOGW(TAG, "Person-follow TEST mode: no detection keeps driving straight");
+    ESP_LOGW(TAG, "Person-follow: no valid detection triggers slow alternating search");
 
     while (1) {
         yolo_detection_t detection = {};
-        int left = 25;
-        int right = 25;
+        int left = 18;
+        int right = 10;
         bool target_valid = false;
+        bool searching = false;
 
         if (yolo_person_get_latest_detection(&detection) &&
             detection.confidence >= confidence_min &&
@@ -247,6 +258,26 @@ static void robot_follow_task(void *arg)
             if (right > 40) right = 40;
             if (left < 0) left = 0;
             if (right < 0) right = 0;
+
+            /* 重新看到人后，下一次丢失从固定搜索方向开始。 */
+            search_direction = 1;
+            search_phase_start_us = esp_timer_get_time();
+        } else {
+            const int64_t now = esp_timer_get_time();
+            if (now - search_phase_start_us >= search_switch_us) {
+                search_direction = -search_direction;
+                search_phase_start_us = now;
+            }
+
+            /* 低速原地缓转搜索：避免无检测时继续直线驶离目标。 */
+            searching = true;
+            if (search_direction > 0) {
+                left = 18;
+                right = 8;
+            } else {
+                left = 8;
+                right = 18;
+            }
         }
 
         const int64_t now_us = esp_timer_get_time();
@@ -259,8 +290,9 @@ static void robot_follow_task(void *arg)
                          detection.x1, detection.y1,
                          detection.x2, detection.y2,
                          left, right);
-            } else {
-                ESP_LOGI(TAG, "FOLLOW no fresh person detection; TEST mode drives straight L=25 R=25");
+            } else if (searching) {
+                ESP_LOGW(TAG, "FOLLOW searching slowly; no valid person box L=%d R=%d",
+                         left, right);
             }
             last_follow_log_us = now_us;
         }
