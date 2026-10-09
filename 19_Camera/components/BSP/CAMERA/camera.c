@@ -212,93 +212,94 @@ static void robot_send_speed(int8_t left, int8_t right)
  * 每 100ms 重发一次，确保 STM32 的 700ms 通信超时保护不会触发。
  * 测试完成后保持 STOP，不再自动动作。
  */
-static void robot_uart_test_task(void *arg)
+/*
+ * 人体跟随任务：
+ * - 每 100ms 发送一帧，持续刷新 STM32 通信看门狗。
+ * - 未检测到有效人体时停车。
+ * - 根据人体框中心控制左右轮差速；人体框高度仅作为粗略距离指标。
+ * - 人体过近时停车，重新拉开距离后再跟随。
+ */
+static void robot_follow_task(void *arg)
 {
     (void)arg;
 
-    enum {
-        TEST_STOP_BEFORE = 0,
-        TEST_LEFT,
-        TEST_STOP_MIDDLE,
-        TEST_RIGHT,
-        TEST_STOP_AFTER,
-        TEST_DONE
-    };
+    const int image_center_x = YOLO_CAMERA_WIDTH / 2;
+    const int deadband_px = 22;
+    const float confidence_min = 0.45f;
+    bool target_too_close = false;
+    int64_t last_follow_log_us = 0;
 
-    int state = TEST_STOP_BEFORE;
-    int64_t state_start_us = esp_timer_get_time();
-    int64_t last_log_us = 0;
-
-    ESP_LOGI(TAG, "=== ROBOT UART TEST TASK START ===");
-    ESP_LOGI(TAG, "STOP 1.0s -> LEFT 1.5s -> STOP 1.0s -> RIGHT 1.5s -> STOP");
+    ESP_LOGI(TAG, "Person-follow task started; no target means STOP");
 
     while (1) {
+        yolo_detection_t detection = {};
+        int left = 0;
+        int right = 0;
+        bool target_valid = false;
+
+        if (yolo_person_get_latest_detection(&detection) &&
+            detection.confidence >= confidence_min &&
+            detection.class_id == YOLO_PERSON_CLASS) {
+            target_valid = true;
+            const float center_x = (detection.x1 + detection.x2) * 0.5f;
+            const float box_height = detection.y2 - detection.y1;
+            const float error_x = center_x - (float)image_center_x;
+
+            /* 简单滞回，避免人体框在阈值附近时电机频繁启停。 */
+            if (target_too_close) {
+                if (box_height < 125.0f) {
+                    target_too_close = false;
+                }
+            } else if (box_height >= 155.0f) {
+                target_too_close = true;
+            }
+
+            if (!target_too_close) {
+                int base_speed;
+                if (box_height < 65.0f) {
+                    base_speed = 30;
+                } else if (box_height < 115.0f) {
+                    base_speed = 23;
+                } else {
+                    base_speed = 14;
+                }
+
+                int steer = 0;
+                if (error_x > (float)deadband_px) {
+                    steer = (int)((error_x - deadband_px) * 0.30f);
+                } else if (error_x < -(float)deadband_px) {
+                    steer = (int)((error_x + deadband_px) * 0.30f);
+                }
+
+                if (steer > 22) steer = 22;
+                if (steer < -22) steer = -22;
+
+                left = base_speed + steer;
+                right = base_speed - steer;
+
+                if (left > 45) left = 45;
+                if (right > 45) right = 45;
+                if (left < 0) left = 0;
+                if (right < 0) right = 0;
+            }
+        }
+
         const int64_t now_us = esp_timer_get_time();
-        const int64_t elapsed_us = now_us - state_start_us;
-
-        switch (state) {
-            case TEST_STOP_BEFORE:
-                if (elapsed_us >= 1000000) {
-                    state = TEST_LEFT;
-                    state_start_us = now_us;
-                    ESP_LOGI(TAG, "UART TEST: LEFT (-60, +60)");
-                }
-                break;
-            case TEST_LEFT:
-                if (elapsed_us >= 1500000) {
-                    state = TEST_STOP_MIDDLE;
-                    state_start_us = now_us;
-                    ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
-                }
-                break;
-            case TEST_STOP_MIDDLE:
-                if (elapsed_us >= 1000000) {
-                    state = TEST_RIGHT;
-                    state_start_us = now_us;
-                    ESP_LOGI(TAG, "UART TEST: RIGHT (+60, -60)");
-                }
-                break;
-            case TEST_RIGHT:
-                if (elapsed_us >= 1500000) {
-                    state = TEST_STOP_AFTER;
-                    state_start_us = now_us;
-                    ESP_LOGI(TAG, "UART TEST: STOP (0, 0)");
-                }
-                break;
-            case TEST_STOP_AFTER:
-                if (elapsed_us >= 1000000) {
-                    state = TEST_DONE;
-                    state_start_us = now_us;
-                    ESP_LOGI(TAG, "=== ROBOT UART TEST DONE; KEEP STOP ===");
-                }
-                break;
-            case TEST_DONE:
-            default:
-                break;
+        if (now_us - last_follow_log_us >= 1000000) {
+            if (target_valid) {
+                ESP_LOGI(TAG,
+                         "FOLLOW conf=%.2f center_x=%.0f box_h=%.0f L=%d R=%d close=%d",
+                         detection.confidence,
+                         (detection.x1 + detection.x2) * 0.5f,
+                         detection.y2 - detection.y1,
+                         left, right, target_too_close ? 1 : 0);
+            } else {
+                ESP_LOGI(TAG, "FOLLOW no fresh person detection; STOP");
+            }
+            last_follow_log_us = now_us;
         }
 
-        int8_t left = 0;
-        int8_t right = 0;
-        if (state == TEST_LEFT) {
-            left = -60;
-            right = 60;
-        } else if (state == TEST_RIGHT) {
-            left = 60;
-            right = -60;
-        }
-
-        /*
-         * UART test runs in its own task, independent of camera capture/LCD/video.
-         * Repeated 100ms frames keep the STM32 communication watchdog refreshed.
-         */
-        robot_send_speed(left, right);
-
-        if (state != TEST_DONE && now_us - last_log_us >= 1000000) {
-            ESP_LOGI(TAG, "UART frame heartbeat: state=%d left=%d right=%d",
-                     state, (int)left, (int)right);
-            last_log_us = now_us;
-        }
-
+        robot_send_speed((int8_t)left, (int8_t)right);
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
@@ -331,17 +332,17 @@ void camera_init(void)
 
     if (s_robot_uart_ready) {
         BaseType_t task_ok = xTaskCreate(
-            robot_uart_test_task,
-            "robot_uart_test",
+            robot_follow_task,
+            "robot_follow",
             3072,
             NULL,
             2,
             NULL);
         if (task_ok != pdPASS) {
-            ESP_LOGE(TAG, "Failed to create robot UART test task");
+            ESP_LOGE(TAG, "Failed to create person-follow task");
         }
     } else {
-        ESP_LOGE(TAG, "Robot UART unavailable; motor test task not started");
+        ESP_LOGE(TAG, "Robot UART unavailable; person-follow task not started");
     }
 }
 
@@ -360,6 +361,16 @@ void camera_show(uint16_t x, uint16_t y)
                  fb->width, fb->height, fb->format);
         esp_camera_fb_return(fb);
         return;
+    }
+
+    /* 提交原始帧给异步 YOLO；推理任务自行复制图像，不阻塞摄像头显示。 */
+    (void)yolo_person_submit_frame(fb->buf, fb->width, fb->height);
+
+    yolo_detection_t detection = {};
+    if (yolo_person_get_latest_detection(&detection) &&
+        detection.confidence >= 0.45f &&
+        detection.class_id == YOLO_PERSON_CLASS) {
+        draw_detection_box(fb->buf, fb->width, fb->height, &detection);
     }
 
     if (!video_stream_pc_video_active()) {
