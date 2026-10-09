@@ -196,10 +196,11 @@ static void robot_send_speed(int8_t left, int8_t right)
 }
 
 /*
- * 人体跟随任务：
+ * 人体跟随测试模式：
  * - 每 100ms 发送一帧，持续刷新 STM32 通信看门狗。
- * - 检测到有效人体时以固定基础速度前进，并根据人体框中心差速转向。
- * - 检测结果无效或过期时停车。
+ * - 有效检测到人体时以固定基础速度前进，并根据人体框中心差速转向。
+ * - 暂时禁用“未检测到人体就停车”的逻辑，未检测到人体时保持直行，
+ *   仅用于测试摄像头视野较小时的转向效果。
  * - 不使用人体框高度作为停车条件或速度控制依据。
  */
 static void robot_follow_task(void *arg)
@@ -211,12 +212,12 @@ static void robot_follow_task(void *arg)
     const float confidence_min = 0.45f;
     int64_t last_follow_log_us = 0;
 
-    ESP_LOGI(TAG, "Person-follow task started; no valid detection means STOP");
+    ESP_LOGW(TAG, "Person-follow TEST mode: no detection keeps driving straight");
 
     while (1) {
         yolo_detection_t detection = {};
-        int left = 0;
-        int right = 0;
+        int left = 25;
+        int right = 25;
         bool target_valid = false;
 
         if (yolo_person_get_latest_detection(&detection) &&
@@ -259,7 +260,7 @@ static void robot_follow_task(void *arg)
                          detection.x2, detection.y2,
                          left, right);
             } else {
-                ESP_LOGI(TAG, "FOLLOW no fresh person detection; STOP");
+                ESP_LOGI(TAG, "FOLLOW no fresh person detection; TEST mode drives straight L=25 R=25");
             }
             last_follow_log_us = now_us;
         }
