@@ -1,11 +1,9 @@
 #include "stm32f10x.h"
 #include "Delay.h"
 #include "robot.h"
-#include "UltrasonicWave.h"
 #include "Serial.h"
 #include "timer.h"
 #include "Buzzer.h"
-#include "Servo.h"
 
 /*
  * ESP32-S3 -> STM32F103C8T6 人跟随控制
@@ -23,12 +21,10 @@
  */
 
 #define ESP_CONTROL_TIMEOUT_MS 700
-#define OBSTACLE_STOP_CM_X10 600
 
 static int8_t g_left_speed = 0;
 static int8_t g_right_speed = 0;
 static uint16_t g_control_age_ms = ESP_CONTROL_TIMEOUT_MS;
-static int g_front_distance_x10 = 0;
 static uint32_t g_valid_frame_count = 0;
 static uint16_t g_rx_beep_ms = 0;
 static uint8_t g_rx_beep_done = 0;
@@ -102,13 +98,9 @@ int main(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 
 	Buzzer_Init();
-	UltrasonicWave_Init();
 	Serial_Init();
 	robot_Init();
-	Servo_Init();
 
-	/* 超声波舵机固定朝正前方，只做安全停车，不再自动左右扫描。 */
-	Servo_SetAngle(90);
 	robot_set_signed_speed(0,0);
 
 	Serial_Printf("\r\nESP32 person-follow controller ready\r\n");
@@ -129,28 +121,13 @@ int main(void)
 			Buzzer_OFF();
 		}
 
-		/* 每 100 ms 触发一次新的前方测距。 */
-		if(tick_ms == 0)
-		{
-			g_front_distance_x10 = UltrasonicWave_StartMeasure();
-		}
-
 		if(g_control_age_ms < ESP_CONTROL_TIMEOUT_MS)
 		{
 			g_control_age_ms++;
 		}
 
-		/*
-		 * 安全优先：
-		 * 通信中断、没有检测到人（ESP32 会发送 0/0）、或超声波发现障碍，
-		 * 最终都会让车辆停下。
-		 */
+		/* 本次调试暂时关闭超声波避障；通信超时保护仍然保留。 */
 		if(g_control_age_ms >= ESP_CONTROL_TIMEOUT_MS)
-		{
-			robot_set_signed_speed(0,0);
-		}
-		else if(g_front_distance_x10 > 0 &&
-		        g_front_distance_x10 < OBSTACLE_STOP_CM_X10)
 		{
 			robot_set_signed_speed(0,0);
 		}
@@ -168,16 +145,11 @@ int main(void)
 			{
 				stop_reason = 1; /* 串口超时 */
 			}
-			else if(g_front_distance_x10 > 0 &&
-			        g_front_distance_x10 < OBSTACLE_STOP_CM_X10)
-			{
-				stop_reason = 2; /* 超声波触发避障 */
-			}
-			Serial_Printf("DBG rx=%lu L=%d R=%d age=%u dist_x10=%d stop=%u\r\n",
+			Serial_Printf("DBG rx=%lu L=%d R=%d age=%u stop=%u\r\n",
 			              (unsigned long)g_valid_frame_count,
 			              (int)g_left_speed, (int)g_right_speed,
 			              (unsigned int)g_control_age_ms,
-			              g_front_distance_x10, (unsigned int)stop_reason);
+			              (unsigned int)stop_reason);
 			debug_ms = 0;
 		}
 
