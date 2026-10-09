@@ -14,10 +14,8 @@
  *
  * USART1：PA9 TX，PA10 RX，115200 8N1
  *
- * 优先级：
- * 1. ESP32 通信超时 -> 停车
- * 2. 前方超声波 < 60 cm -> 停车
- * 3. ESP32 人跟随左右轮速度
+ * 调试阶段暂时关闭超声波避障，仅保留通信超时停车保护。
+ * 收到首帧校验正确的数据时，蜂鸣器提示一次。
  */
 
 #define ESP_CONTROL_TIMEOUT_MS 700
@@ -91,7 +89,6 @@ static void parse_esp_command(void)
 
 int main(void)
 {
-	uint16_t tick_ms = 0;
 	uint16_t debug_ms = 0;
 
 	Timerx_Init(5000,7199);
@@ -155,10 +152,5 @@ int main(void)
 
 		Delay_ms(1);
 
-		tick_ms++;
-		if(tick_ms >= 100)
-		{
-			tick_ms = 0;
-		}
 	}
 }
