@@ -16,19 +16,19 @@ static const char *TAG = "camera";
 
 /*
  * ESP32-S3 -> STM32F103C8T6
- * UART1 TX = GPIO1
+ * UART1 TX = GPIO36 (temporary test choice requested by user)
  * 115200 8N1
  *
  * 当前只使用 TX：
- *   ESP32 GPIO1 -> STM32 PA10 (USART1_RX)
- *   GND         -> GND
+ *   ESP32 GPIO36 -> STM32 PA10 (USART1_RX)
+ *   GND          -> GND
  *
- * GPIO1 同时作为开发板 ADC/功能按键引脚使用。本测试暂时复用为 UART TX：
- * 测试期间不要按该按键，也不要让其他代码配置/读取 GPIO1。
- * 若按键电路会在按下时把 GPIO1 拉高/拉低，按键可能干扰串口输出。
+ * WARNING: GPIO36 may be used by Octal PSRAM on some ESP32-S3 modules.
+ * Verify the exact module pinout and confirm the board boots/PSRAM works
+ * before relying on this pin. If boot or PSRAM becomes unstable, revert this pin.
  */
 #define ROBOT_UART       UART_NUM_1
-#define ROBOT_UART_TX    GPIO_NUM_1
+#define ROBOT_UART_TX    GPIO_NUM_36
 #define ROBOT_UART_BAUD  115200
 
 static bool s_robot_uart_ready = false;
@@ -165,8 +165,8 @@ static void robot_uart_init(void)
 
     s_robot_uart_ready = true;
     ESP_LOGI(TAG,
-             "Robot UART ready: TX GPIO1 (shared ADC/button pin) -> STM32 PA10, 115200 8N1");
-    ESP_LOGW(TAG, "UART test: do NOT press the GPIO1 button during motor testing");
+             "Robot UART ready: TX GPIO36 -> STM32 PA10, 115200 8N1");
+    ESP_LOGW(TAG, "GPIO36 may conflict with Octal PSRAM on some ESP32-S3 modules");
 }
 
 /*
