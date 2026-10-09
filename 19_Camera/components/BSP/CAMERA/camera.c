@@ -16,18 +16,17 @@ static const char *TAG = "camera";
 
 /*
  * ESP32-S3 -> STM32F103C8T6
- * UART1 TX = GPIO40, RX = GPIO39
+ * UART1 TX = GPIO1
  * 115200 8N1
  *
  * 当前只使用 TX：
- *   ESP32 GPIO40 -> STM32 PA10 (USART1_RX)
- *   GND          -> GND
+ *   ESP32 GPIO1 -> STM32 PA10 (USART1_RX)
+ *   GND         -> GND
  *
- * GPIO39/40 未被当前摄像头、LCD、音频配置占用。
+ * GPIO1 未被当前摄像头、LCD、音频代码配置使用。
  */
 #define ROBOT_UART       UART_NUM_1
-#define ROBOT_UART_TX    GPIO_NUM_40
-#define ROBOT_UART_RX    GPIO_NUM_39
+#define ROBOT_UART_TX    GPIO_NUM_1
 #define ROBOT_UART_BAUD  115200
 
 static bool s_robot_uart_ready = false;
@@ -153,7 +152,7 @@ static void robot_uart_init(void)
     err = uart_set_pin(
         ROBOT_UART,
         ROBOT_UART_TX,
-        ROBOT_UART_RX,
+        UART_PIN_NO_CHANGE,
         UART_PIN_NO_CHANGE,
         UART_PIN_NO_CHANGE);
     if (err != ESP_OK) {
@@ -163,7 +162,7 @@ static void robot_uart_init(void)
 
     s_robot_uart_ready = true;
     ESP_LOGI(TAG,
-             "Robot UART ready: TX GPIO40 -> STM32 PA10, 115200 8N1");
+             "Robot UART ready: TX GPIO1 -> STM32 PA10, 115200 8N1");
 }
 
 /*
