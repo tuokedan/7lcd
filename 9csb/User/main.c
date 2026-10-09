@@ -29,6 +29,7 @@ static int8_t g_left_speed = 0;
 static int8_t g_right_speed = 0;
 static uint16_t g_control_age_ms = ESP_CONTROL_TIMEOUT_MS;
 static int g_front_distance_x10 = 0;
+static uint32_t g_valid_frame_count = 0;
 
 static void parse_esp_command(void)
 {
@@ -72,6 +73,7 @@ static void parse_esp_command(void)
 					g_left_speed = (int8_t)left_byte;
 					g_right_speed = (int8_t)right_byte;
 					g_control_age_ms = 0;
+					g_valid_frame_count++;
 				}
 				state = 0;
 				break;
@@ -86,6 +88,7 @@ static void parse_esp_command(void)
 int main(void)
 {
 	uint16_t tick_ms = 0;
+	uint16_t debug_ms = 0;
 
 	Timerx_Init(5000,7199);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
@@ -135,6 +138,28 @@ int main(void)
 		else
 		{
 			robot_set_signed_speed(g_left_speed,g_right_speed);
+		}
+
+		/* 每约 500ms 从 USART1_TX(PA9) 输出一次诊断，确认收到帧及停车原因。 */
+		debug_ms++;
+		if(debug_ms >= 500)
+		{
+			uint8_t stop_reason = 0;
+			if(g_control_age_ms >= ESP_CONTROL_TIMEOUT_MS)
+			{
+				stop_reason = 1; /* 串口超时 */
+			}
+			else if(g_front_distance_x10 > 0 &&
+			        g_front_distance_x10 < OBSTACLE_STOP_CM_X10)
+			{
+				stop_reason = 2; /* 超声波触发避障 */
+			}
+			Serial_Printf("DBG rx=%lu L=%d R=%d age=%u dist_x10=%d stop=%u\\r\\n",
+			              (unsigned long)g_valid_frame_count,
+			              (int)g_left_speed, (int)g_right_speed,
+			              (unsigned int)g_control_age_ms,
+			              g_front_distance_x10, (unsigned int)stop_reason);
+			debug_ms = 0;
 		}
 
 		Delay_ms(1);
