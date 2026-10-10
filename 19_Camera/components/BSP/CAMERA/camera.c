@@ -235,6 +235,11 @@ static void robot_follow_task(void *arg)
         if (yolo_person_get_latest_detection(&detection) &&
             detection.confidence >= confidence_min &&
             detection.class_id == YOLO_PERSON_CLASS) {
+            /*
+             * detection.x1/y1/x2/y2 已由 yolo_person.cpp 缩为原框宽、高的 50%。
+             * 后续跟随控制、中心点判断和日志统一使用这组缩小后的坐标，
+             * 不再引用模型原始框或未缩放的映射坐标。
+             */
             const float center_x = (detection.x1 + detection.x2) * 0.5f;
 
             target_valid = true;
