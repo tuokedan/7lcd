@@ -440,30 +440,56 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
         if (x2 > width - 1) x2 = width - 1;
         if (y2 > height - 1) y2 = height - 1;
 
+        /*
+         * 将检测框以中心点为基准缩小到原宽、高的 50%。
+         * 例如原框 [10,10,240,230]，中心点为 (125,120)，
+         * 缩小后约为 [67.5,65,182.5,175]。
+         * 保持中心点不变，避免缩框影响跟随方向判断。
+         */
+        const float original_x1 = x1;
+        const float original_y1 = y1;
+        const float original_x2 = x2;
+        const float original_y2 = y2;
+        const float center_x = (original_x1 + original_x2) * 0.5f;
+        const float center_y = (original_y1 + original_y2) * 0.5f;
+        const float half_w = (original_x2 - original_x1) * 0.25f;
+        const float half_h = (original_y2 - original_y1) * 0.25f;
+
+        x1 = center_x - half_w;
+        x2 = center_x + half_w;
+        y1 = center_y - half_h;
+        y2 = center_y + half_h;
+
+        if (x1 < 0.0f) x1 = 0.0f;
+        if (y1 < 0.0f) y1 = 0.0f;
+        if (x2 > width - 1) x2 = width - 1;
+        if (y2 > height - 1) y2 = height - 1;
+
         const float box_w = x2 - x1;
         const float box_h = y2 - y1;
         const float box_area = box_w * box_h;
         const float image_area = static_cast<float>(width) * height;
 
         /*
-         * 当前日志里的整屏框属于异常框，不能拿它计算转向中心。
-         * 过滤几乎覆盖全宽、全高或面积超过画面 75% 的框。
+         * 缩框后仍覆盖几乎全宽、全高或面积超过画面 75% 时，
+         * 仍视为异常框并过滤。
          */
         if (box_w <= 1.0f || box_h <= 1.0f ||
             box_w >= width * 0.95f ||
             box_h >= height * 0.95f ||
             box_area >= image_area * 0.75f) {
             ESP_LOGW(TAG,
-                     "Reject oversized box raw=[%d,%d,%d,%d] mapped=(%.0f,%.0f)-(%.0f,%.0f) score=%.2f",
+                     "Reject oversized box raw=[%d,%d,%d,%d] shrunk=(%.0f,%.0f)-(%.0f,%.0f) score=%.2f",
                      result.box[0], result.box[1],
                      result.box[2], result.box[3],
                      x1, y1, x2, y2, result.score);
             continue;
         }
 
-        ESP_LOGI(TAG, "Raw box=[%d,%d,%d,%d] -> mapped=(%.0f,%.0f)-(%.0f,%.0f) score=%.2f",
+        ESP_LOGI(TAG, "Raw box=[%d,%d,%d,%d] -> mapped=(%.0f,%.0f)-(%.0f,%.0f) shrunk=(%.0f,%.0f)-(%.0f,%.0f) score=%.2f",
                  result.box[0], result.box[1],
                  result.box[2], result.box[3],
+                 original_x1, original_y1, original_x2, original_y2,
                  x1, y1, x2, y2, result.score);
 
         detection->x1 = x1;
