@@ -492,6 +492,11 @@ extern "C" bool yolo_person_detect_rgb565(const uint8_t *rgb565,
                  original_x1, original_y1, original_x2, original_y2,
                  x1, y1, x2, y2, result.score);
 
+        /*
+         * 关键：对外发布的 detection 坐标就是缩小后的 x1/y1/x2/y2。
+         * 绘框、中心点定位、直行区间判断、左右轮转向以及后续框尺寸判断
+         * 都必须使用这里的 detection 坐标，不使用 original_x1 等原始映射坐标。
+         */
         detection->x1 = x1;
         detection->y1 = y1;
         detection->x2 = x2;
