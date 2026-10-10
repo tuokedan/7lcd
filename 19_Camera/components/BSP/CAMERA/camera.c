@@ -214,8 +214,9 @@ static void robot_follow_task(void *arg)
 {
     (void)arg;
 
-    const int image_center_x = YOLO_CAMERA_WIDTH / 2;
-    const int deadband_px = 22;
+    /* 检测框中心 x 落在 150~170 像素内才直行。 */
+    const float straight_min_x = 150.0f;
+    const float straight_max_x = 170.0f;
     const float confidence_min = 0.45f;
     const int64_t search_switch_us = 800000;
     int64_t search_phase_start_us = esp_timer_get_time();
@@ -235,17 +236,21 @@ static void robot_follow_task(void *arg)
             detection.confidence >= confidence_min &&
             detection.class_id == YOLO_PERSON_CLASS) {
             const float center_x = (detection.x1 + detection.x2) * 0.5f;
-            const float error_x = center_x - (float)image_center_x;
 
             target_valid = true;
 
             const int base_speed = 25;
             int steer = 0;
 
-            if (error_x > (float)deadband_px) {
-                steer = (int)((error_x - deadband_px) * 0.30f);
-            } else if (error_x < -(float)deadband_px) {
-                steer = (int)((error_x + deadband_px) * 0.30f);
+            /*
+             * 中点在 [150,170] 内：直行。
+             * 中点 > 170：向一侧转弯；中点 < 150：向另一侧转弯。
+             * 转向量按超出边界的像素距离计算。
+             */
+            if (center_x > straight_max_x) {
+                steer = (int)((center_x - straight_max_x) * 0.30f);
+            } else if (center_x < straight_min_x) {
+                steer = (int)((center_x - straight_min_x) * 0.30f);
             }
 
             if (steer > 18) steer = 18;
